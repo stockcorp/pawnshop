@@ -49,7 +49,7 @@
             color: red;
             display: none;
         }
-        input[type="file"] {
+        input[type="file"], input[type="password"], input[type="text"] {
             width: 100%;
             max-width: 300px;
         }
@@ -58,6 +58,10 @@
 <body class="flex items-center justify-center min-h-screen">
     <div class="container mx-auto px-4 py-6 text-center">
         <h1 class="text-2xl font-bold text-gray-800 mb-6">XX當鋪後台管理</h1>
+        <div class="mb-6">
+            <label class="block mb-2 text-gray-700">GitHub Personal Access Token</label>
+            <input type="text" id="github-token" placeholder="輸入你的 GitHub PAT" class="mb-4 p-2 border rounded">
+        </div>
         <div class="mb-6">
             <label class="block mb-2 text-gray-700">更新文章內容</label>
             <input type="file" id="content-upload" accept="text/plain,.txt" class="mb-4 p-2 border rounded">
@@ -94,9 +98,9 @@
             console.error('MD5 庫未載入，請檢查網路或 CDN');
             alert('無法載入加密功能，請檢查網路後重試！');
             document.getElementById('upload-btn').disabled = true;
-        } else {
-            console.log('MD5 庫載入成功');
+            return;
         }
+        console.log('MD5 庫載入成功');
 
         // MD5 加密的密碼雜湊值
         const correctHash = '5f4dcc3b5aa765d61d8327deb882cf99'; // phpmyadmin 的 MD5
@@ -104,14 +108,15 @@
         const photoUpload = document.getElementById('photo-upload');
         const photoSelect = document.getElementById('photo-select');
         const passwordInput = document.getElementById('password');
+        const githubTokenInput = document.getElementById('github-token');
         const errorMessage = document.getElementById('error-message');
         const uploadBtn = document.getElementById('upload-btn');
 
-        uploadBtn.addEventListener('click', () => {
+        uploadBtn.addEventListener('click', async () => {
             console.log('點擊上傳按鈕，開始驗證');
 
             // 清理輸入並計算 MD5 雜湊值
-            const inputValue = passwordInput.value.replace(/\s+/g, ''); // 移除所有空白
+            const inputValue = passwordInput.value.replace(/\s+/g, '');
             console.log('輸入密碼（清理後）:', inputValue);
 
             if (!inputValue) {
@@ -121,7 +126,7 @@
                 return;
             }
 
-            const inputHash = md5(inputValue.toLowerCase()); // 轉小寫以防大小寫問題
+            const inputHash = md5(inputValue);
             console.log('計算的 MD5 雜湊:', inputHash);
 
             if (inputHash !== correctHash) {
@@ -134,8 +139,16 @@
             console.log('密碼驗證成功');
             errorMessage.style.display = 'none';
 
+            const token = githubTokenInput.value.trim();
+            if (!token) {
+                console.log('未輸入 GitHub Token');
+                alert('請輸入 GitHub Personal Access Token！');
+                return;
+            }
+
             let uploaded = false;
 
+            // 上傳文章內容
             if (contentUpload.files.length > 0) {
                 const file = contentUpload.files[0];
                 console.log('選擇文章檔案:', file.name, '類型:', file.type);
@@ -144,13 +157,28 @@
                     alert('請上傳 .txt 檔案！');
                     return;
                 }
-                console.log('模擬上傳 content.txt:', file.name);
-                alert('文章內容已模擬上傳！');
-                uploaded = true;
+
+                try {
+                    const content = await file.text();
+                    const base64Content = btoa(unescape(encodeURIComponent(content)));
+                    const uploadSuccess = await uploadToGitHub(token, 'content/content.txt', base64Content, file.name);
+                    if (uploadSuccess) {
+                        console.log('上傳 content.txt 成功');
+                        alert('文章內容已成功上傳！');
+                        uploaded = true;
+                    } else {
+                        console.log('上傳 content.txt 失敗');
+                        alert('文章內容上傳失敗，請檢查 Token 或網路！');
+                    }
+                } catch (error) {
+                    console.error('上傳 content.txt 錯誤:', error);
+                    alert('上傳文章內容時發生錯誤：' + error.message);
+                }
             } else {
                 console.log('未選擇文章檔案');
             }
 
+            // 上傳照片
             if (photoUpload.files.length > 0) {
                 const file = photoUpload.files[0];
                 console.log('選擇照片檔案:', file.name, '類型:', file.type);
@@ -159,10 +187,27 @@
                     alert('請上傳 .jpg 檔案！');
                     return;
                 }
-                const selectedPic = `pic${photoSelect.value}.jpg`;
-                console.log('模擬上傳', selectedPic, ':', file.name);
-                alert(`圖片 ${selectedPic} 已模擬上傳！`);
-                uploaded = true;
+
+                try {
+                    const reader = new FileReader();
+                    const base64Content = await new Promise(resolve => {
+                        reader.onload = () => resolve(reader.result.split(',')[1]);
+                        reader.readAsDataURL(file);
+                    });
+                    const selectedPic = `img/pic${photoSelect.value}.jpg`;
+                    const uploadSuccess = await uploadToGitHub(token, selectedPic, base64Content, file.name);
+                    if (uploadSuccess) {
+                        console.log('上傳', selectedPic, '成功');
+                        alert(`圖片 ${selectedPic} 已成功上傳！`);
+                        uploaded = true;
+                    } else {
+                        console.log('上傳', selectedPic, '失敗');
+                        alert(`圖片 ${selectedPic} 上傳失敗，請檢查 Token 或網路！`);
+                    }
+                } catch (error) {
+                    console.error('上傳', selectedPic, '錯誤:', error);
+                    alert('上傳圖片時發生錯誤：' + error.message);
+                }
             } else {
                 console.log('未選擇照片檔案');
             }
@@ -172,6 +217,59 @@
                 alert('請選擇要上傳的檔案！');
             }
         });
+
+        // GitHub API 上傳函數
+        async function uploadToGitHub(token, path, base64Content, fileName) {
+            console.log('開始上傳至 GitHub:', path);
+            try {
+                // 替換為你的 GitHub 倉庫
+                const repo = 'your-username/pawnshop'; // TODO: 改為你的倉庫
+                let sha = null;
+                try {
+                    const getResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    if (getResponse.ok) {
+                        const getData = await getResponse.json();
+                        sha = getData.sha;
+                        console.log('獲取檔案 SHA:', sha);
+                    } else if (getResponse.status !== 404) {
+                        throw new Error('獲取檔案資訊失敗');
+                    }
+                } catch (error) {
+                    console.warn('檔案可能不存在，視為新檔案');
+                }
+
+                const response = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `上傳 ${fileName}`,
+                        content: base64Content,
+                        sha: sha
+                    })
+                });
+
+                if (response.ok) {
+                    console.log('GitHub API 上傳成功:', path);
+                    return true;
+                } else {
+                    const errorData = await response.json();
+                    console.error('GitHub API 上傳失敗:', errorData);
+                    return false;
+                }
+            } catch (error) {
+                console.error('上傳至 GitHub 錯誤:', error);
+                throw error;
+            }
+        }
 
         // 輸入時隱藏錯誤訊息
         passwordInput.addEventListener('input', () => {
