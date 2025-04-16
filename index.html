@@ -37,13 +37,12 @@
     <meta name="author" content="XX當鋪">
     <meta property="og:title" content="XX當鋪 - 快速借款與典當服務">
     <meta property="og:description" content="提供汽車、機車、房屋借款，黃金鑽石典當及信用貸款，位於台北228紀念公園附近，立即聯繫我們！">
-    <meta property="og:image" content="https://your-github-username.github.io/pawnshop/img/banner.jpg">
-    <meta property="og:url" content="https://your-github-username.github.io/pawnshop/">
+    <meta property="og:image" content="https://stockcorp.github.io/pawnshop/img/banner.jpg">
+    <meta property="og:url" content="https://stockcorp.github.io/pawnshop/">
     <meta property="og:type" content="website">
     <title>XX當鋪 - 快速借款與典當服務</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        /* 自訂樣式 */
         .banner {
             width: 100%;
             height: 300px;
@@ -114,6 +113,20 @@
         .contact-float a:hover {
             opacity: 0.9;
         }
+        .article-card {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .article-card:hover {
+            transform: scale(1.02);
+        }
+        .single-page {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+        }
         @media (max-width: 768px) {
             .banner {
                 height: 200px;
@@ -160,16 +173,16 @@
             <button class="nav-btn bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-md" data-page="about">關於我們</button>
             <button class="nav-btn bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-md" data-page="contact">聯絡我們</button>
             <div class="share-buttons">
-                <a href="https://www.facebook.com/sharer/sharer.php?u=https://github.com/stockcorp/-pawnshop" target="_blank" class="share-button facebook">
+                <a href="https://www.facebook.com/sharer/sharer.php?u=https://stockcorp.github.io/pawnshop" target="_blank" class="share-button facebook">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/10.0.0/facebook.svg" alt="Facebook Share" width="32" height="32">
                 </a>
-                <a href="https://x.com/intent/tweet?url=https://github.com/stockcorp/-pawnshop" target="_blank" class="share-button x">
+                <a href="https://x.com/intent/tweet?url=https://stockcorp.github.io/pawnshop" target="_blank" class="share-button x">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/10.0.0/x.svg" alt="X Share" width="32" height="32">
                 </a>
-                <a href="https://www.instagram.com/?url=https://github.com/stockcorp/-pawnshop" target="_blank" class="share-button instagram">
+                <a href="https://www.instagram.com/?url=https://stockcorp.github.io/pawnshop" target="_blank" class="share-button instagram">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/10.0.0/instagram.svg" alt="Instagram Share" width="32" height="32">
                 </a>
-                <a href="https://line.me/R/msg/text/?探索XX當鋪快速借款服務！%0D%0Ahttps://github.com/stockcorp/-pawnshop" target="_blank" class="share-button line">
+                <a href="https://line.me/R/msg/text/?探索XX當鋪快速借款服務！%0D%0Ahttps://stockcorp.github.io/pawnshop" target="_blank" class="share-button line">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/10.0.0/line.svg" alt="Line Share" width="32" height="32">
                 </a>
             </div>
@@ -222,31 +235,8 @@
 
             <!-- 服務介紹 -->
             <section id="services" class="page-content hidden">
-                <div class="service-grid bg-white rounded-lg shadow-lg p-6">
-                    <div class="service-card bg-gray-50 rounded-lg p-4 text-center shadow">
-                        <h3 class="text-xl font-semibold text-gray-800">汽車借款</h3>
-                        <p class="text-gray-600">快速審核，車輛照開，資金即到！</p>
-                    </div>
-                    <div class="service-card bg-gray-50 rounded-lg p-4 text-center shadow">
-                        <h3 class="text-xl font-semibold text-gray-800">機車借款</h3>
-                        <p class="text-gray-600">即時放款，免留車，手續簡便。</p>
-                    </div>
-                    <div class="service-card bg-gray-50 rounded-lg p-4 text-center shadow">
-                        <h3 class="text-xl font-semibold text-gray-800">房屋借款</h3>
-                        <p class="text-gray-600">低利率，長還款期，輕鬆解決資金需求。</p>
-                    </div>
-                    <div class="service-card bg-gray-50 rounded-lg p-4 text-center shadow">
-                        <h3 class="text-xl font-semibold text-gray-800">助還代償</h3>
-                        <p class="text-gray-600">整合債務，降低壓力，專業協助。</p>
-                    </div>
-                    <div class="service-card bg-gray-50 rounded-lg p-4 text-center shadow">
-                        <h3 class="text-xl font-semibold text-gray-800">黃金鑽石典當</h3>
-                        <p class="text-gray-600">高價收當，安全保密，快速兌現。</p>
-                    </div>
-                    <div class="service-card bg-gray-50 rounded-lg p-4 text-center shadow">
-                        <h3 class="text-xl font-semibold text-gray-800">現金信用貸款</h3>
-                        <p class="text-gray-600">無需抵押，信用評估，靈活還款。</p>
-                    </div>
+                <div id="service-grid" class="service-grid bg-white rounded-lg shadow-lg p-6">
+                    <!-- 動態插入服務方格 -->
                 </div>
             </section>
 
@@ -271,6 +261,22 @@
                         <a href="https://line.me/ti/p/your-line-id" target="_blank" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">XX當鋪 (Line)</a>
                     </div>
                     <iframe class="w-full h-64 rounded-lg" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.9728964134636!2d121.51168581500674!3d25.03497298396453!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a946d5171e7f%3A0x5b4f6d6c6d6d6d6d!2sTaipei%20228%20Memorial%20Park!5e0!3m2!1szh-TW!2stw!4v1634567890123" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </section>
+
+            <!-- 單獨文章頁面 -->
+            <section id="single-article" class="page-content hidden">
+                <div class="single-page">
+                    <button id="article-back-btn" class="mb-4 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">返回</button>
+                    <div id="article-content"></div>
+                </div>
+            </section>
+
+            <!-- 單獨服務頁面 -->
+            <section id="single-service" class="page-content hidden">
+                <div class="single-page">
+                    <button id="service-back-btn" class="mb-4 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">返回</button>
+                    <div id="service-content"></div>
                 </div>
             </section>
         </main>
@@ -308,6 +314,7 @@
 
         // 輪播功能
         let currentSlide = 0;
+        let articles = [];
         const carouselItems = document.getElementById('carousel-items');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
@@ -319,20 +326,52 @@
         }
 
         prevBtn.addEventListener('click', () => {
-            currentSlide = (currentSlide - 1 + 10) % 10;
+            currentSlide = (currentSlide - 1 + articles.length) % articles.length;
             updateCarousel();
         });
 
         nextBtn.addEventListener('click', () => {
-            currentSlide = (currentSlide + 1) % 10;
+            currentSlide = (currentSlide + 1) % articles.length;
             updateCarousel();
+        });
+
+        // 單獨文章頁面
+        function showSingleArticle(index) {
+            const article = articles[index];
+            const articleContent = document.getElementById('article-content');
+            articleContent.innerHTML = `
+                <img src="${article.image}" alt="文章圖片" class="w-full h-64 object-cover rounded-lg mb-4">
+                <p class="text-gray-700">${article.text}</p>
+            `;
+            switchPage('single-article');
+        }
+
+        document.getElementById('article-back-btn').addEventListener('click', () => {
+            switchPage('news');
+        });
+
+        // 單獨服務頁面
+        function showSingleService(index) {
+            const service = services[index];
+            const serviceContent = document.getElementById('service-content');
+            serviceContent.innerHTML = `
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">${service.title}</h2>
+                <img src="${service.image}" alt="${service.title}" class="w-full h-64 object-cover rounded-lg mb-4">
+                <p class="text-gray-700">${service.fullDescription}</p>
+            `;
+            switchPage('single-service');
+        }
+
+        document.getElementById('service-back-btn').addEventListener('click', () => {
+            switchPage('services');
         });
 
         // 載入文章內容
         fetch('content/content.txt')
             .then(response => response.text())
             .then(data => {
-                const articles = data.split('---').map((content, index) => ({
+                const articleArray = data.split('---').filter(content => content.trim() !== '');
+                articles = articleArray.map((content, index) => ({
                     text: content.trim(),
                     image: `img/pic${index + 1}.jpg`
                 }));
@@ -342,9 +381,10 @@
                     const item = document.createElement('div');
                     item.className = `carousel-item flex flex-col md:flex-row items-center gap-6 ${index === 0 ? 'active' : ''}`;
                     item.innerHTML = `
-                        <img src="${article.image}" alt="台北當鋪文章圖片 ${index + 1}" class="w-full md:w-1/2 h-48 object-cover rounded-lg">
-                        <div class="text-gray-700">${article.text}</div>
+                        <img src="${article.image}" alt="台北當鋪文章圖片 ${index + 1}" class="w-full md:w-1/2 h-48 object-cover rounded-lg cursor-pointer">
+                        <div class="text-gray-700 cursor-pointer">${article.text.substring(0, 100)}...</div>
                     `;
+                    item.addEventListener('click', () => showSingleArticle(index));
                     carouselItems.appendChild(item);
                 });
 
@@ -352,23 +392,58 @@
                 const blogPosts = document.getElementById('blog-posts');
                 articles.forEach((article, index) => {
                     const post = document.createElement('div');
-                    post.className = 'mb-6 p-4 bg-gray-50 rounded-lg shadow';
+                    post.className = 'mb-6 p-4 bg-gray-50 rounded-lg shadow article-card';
                     post.innerHTML = `
                         <img src="${article.image}" alt="台北當鋪文章圖片 ${index + 1}" class="w-full h-48 object-cover rounded-lg mb-4">
-                        <div class="text-gray-700">${article.text}</div>
+                        <div class="text-gray-700">${article.text.substring(0, 100)}...</div>
                     `;
+                    post.addEventListener('click', () => showSingleArticle(index));
                     blogPosts.appendChild(post);
                 });
 
                 updateCarousel();
+                // 自動輪播
+                setInterval(() => {
+                    currentSlide = (currentSlide + 1) % articles.length;
+                    updateCarousel();
+                }, 5000);
             })
             .catch(error => console.error('載入文章失敗:', error));
 
-        // 自動輪播
-        setInterval(() => {
-            currentSlide = (currentSlide + 1) % 10;
-            updateCarousel();
-        }, 5000);
+        // 載入服務內容
+        let services = [];
+        fetch('content/service.txt')
+            .then(response => response.text())
+            .then(data => {
+                try {
+                    services = JSON.parse(data);
+                } catch (e) {
+                    console.error('解析服務內容失敗:', e);
+                    services = [
+                        { title: "汽車借款", shortDescription: "快速審核，車輛照開，資金即到！", fullDescription: "我們的汽車借款服務提供免留車方案，最快當天放款，年利率低至 3.5%，靈活還款期限，讓您無壓力駕馭愛車。立即聯繫 XX 當鋪！", image: "img/service1.jpg" },
+                        { title: "機車借款", shortDescription: "即時放款，免留車，手續簡便。", fullDescription: "機車借款無需抵押車輛，手續簡單，現金即得。無論您是上班族或自由業者，最短 3 個月還款期，輕鬆應對緊急開支。", image: "img/service2.jpg" },
+                        { title: "房屋借款", shortDescription: "低利率，長還款期，輕鬆解決資金需求。", fullDescription: "房屋借款提供專業評估，年利率低至 3.5%，最長 5 年還款期，助您實現財務自由。不限職業，快速審批！", image: "img/service3.jpg" },
+                        { title: "助還代償", shortDescription: "整合債務，降低壓力，專業協助。", fullDescription: "助還代償幫您整合高利貸或信用卡債務，快速審批，客製化方案，降低還款壓力。XX 當鋪專業服務，立即諮詢！", image: "img/service4.jpg" },
+                        { title: "黃金鑽石典當", shortDescription: "高價收當，安全保密，快速兌現。", fullDescription: "黃金、鑽石典當提供專業鑑定，最高收購價，現金即得。位於台北市中心，服務快速又保密，立即兌現價值！", image: "img/service5.jpg" },
+                        { title: "現金信用貸款", shortDescription: "無需抵押，信用評估，靈活還款。", fullDescription: "現金信用貸款無需抵押，依據信用評估提供最高額度，年利率 3.5%-10%，最快當日撥款。XX 當鋪助您解決資金難題！", image: "img/service6.jpg" }
+                    ];
+                }
+
+                // 服務介紹方格
+                const serviceGrid = document.getElementById('service-grid');
+                services.forEach((service, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'service-card bg-gray-50 rounded-lg p-4 text-center shadow';
+                    card.innerHTML = `
+                        <h3 class="text-xl font-semibold text-gray-800">${service.title}</h3>
+                        <p class="text-gray-600">${service.shortDescription}</p>
+                        <button class="mt-2 bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700">查看詳情</button>
+                    `;
+                    card.querySelector('button').addEventListener('click', () => showSingleService(index));
+                    serviceGrid.appendChild(card);
+                });
+            })
+            .catch(error => console.error('載入服務內容失敗:', error));
     </script>
 </body>
 </html>
