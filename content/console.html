@@ -142,6 +142,10 @@
         .upload-btn:active, .update-contact-btn:active, .update-name-btn:active, .update-website-btn:active {
             transform: scale(0.95);
         }
+        .upload-btn:disabled, .update-contact-btn:disabled, .update-name-btn:disabled, .update-website-btn:disabled {
+            background: #6B7280;
+            cursor: not-allowed;
+        }
         .download-section {
             margin-top: 20px;
             text-align: left;
@@ -351,6 +355,11 @@
                 return;
             }
 
+            console.log('綁定上傳按鈕');
+            console.log('綁定更新聯絡資訊按鈕');
+            console.log('綁定更新網站名稱按鈕');
+            console.log('綁定更新網站地址按鈕');
+
             // 載入網站名稱
             fetch('content/name.txt')
                 .then(response => response.ok ? response.text() : Promise.reject('檔案未找到'))
@@ -421,12 +430,10 @@
             updateNameBtn.addEventListener('click', async () => {
                 console.log('點擊更新網站名稱按鈕');
                 try {
+                    updateNameBtn.disabled = true;
                     const token = githubTokenInput.value.trim();
                     errorMessage.style.display = 'none';
                     if (!token) {
-                        console.log('未輸入 PAT');
-                        errorMessage.textContent = '請輸入有效的 PAT！';
-                        errorMessage.style.display = 'block';
                         alert('請輸入有效的 PAT！');
                         return;
                     }
@@ -451,6 +458,8 @@
                 } catch (error) {
                     console.error('上傳網站名稱錯誤: ' + error.message);
                     alert('上傳網站名稱時發生錯誤：' + error.message);
+                } finally {
+                    updateNameBtn.disabled = false;
                 }
             });
 
@@ -458,12 +467,10 @@
             updateWebsiteBtn.addEventListener('click', async () => {
                 console.log('點擊更新網站地址按鈕');
                 try {
+                    updateWebsiteBtn.disabled = true;
                     const token = githubTokenInput.value.trim();
                     errorMessage.style.display = 'none';
                     if (!token) {
-                        console.log('未輸入 PAT');
-                        errorMessage.textContent = '請輸入有效的 PAT！';
-                        errorMessage.style.display = 'block';
                         alert('請輸入有效的 PAT！');
                         return;
                     }
@@ -486,6 +493,8 @@
                 } catch (error) {
                     console.error('上傳網站地址錯誤: ' + error.message);
                     alert('上傳網站地址時發生錯誤：' + error.message);
+                } finally {
+                    updateWebsiteBtn.disabled = false;
                 }
             });
 
@@ -493,12 +502,10 @@
             updateContactBtn.addEventListener('click', async () => {
                 console.log('點擊更新聯絡資訊按鈕');
                 try {
+                    updateContactBtn.disabled = true;
                     const token = githubTokenInput.value.trim();
                     errorMessage.style.display = 'none';
                     if (!token) {
-                        console.log('未輸入 PAT');
-                        errorMessage.textContent = '請輸入有效的 PAT！';
-                        errorMessage.style.display = 'block';
                         alert('請輸入有效的 PAT！');
                         return;
                     }
@@ -574,6 +581,8 @@
                 } catch (error) {
                     console.error('上傳聯絡資訊錯誤: ' + error.message);
                     alert('上傳聯絡資訊時發生錯誤：' + error.message);
+                } finally {
+                    updateContactBtn.disabled = false;
                 }
             });
 
@@ -581,12 +590,10 @@
             uploadBtn.addEventListener('click', async () => {
                 console.log('點擊上傳按鈕，開始處理');
                 try {
+                    uploadBtn.disabled = true;
                     const token = githubTokenInput.value.trim();
                     errorMessage.style.display = 'none';
                     if (!token) {
-                        console.log('未輸入 PAT');
-                        errorMessage.textContent = '請輸入有效的 PAT！';
-                        errorMessage.style.display = 'block';
                         alert('請輸入有效的 PAT！');
                         return;
                     }
@@ -796,6 +803,8 @@
                 } catch (error) {
                     console.error('上傳過程發生錯誤: ' + error.message);
                     alert('上傳失敗，請檢查網路或 PAT！');
+                } finally {
+                    uploadBtn.disabled = false;
                 }
             });
 
@@ -846,9 +855,15 @@
                     } else {
                         const errorData = await response.json();
                         console.error('GitHub API 上傳失敗: ' + errorData.message);
-                        if (errorData.message.includes('Not Found')) {
-                            alert('上傳失敗: 倉庫 stockcorp/pawnshop 不存在或檔案路徑無效！');
-                        } else if (errorData.message.includes('Invalid token')) {
-                            alert('上傳失敗: 無效的 PAT，請確認權限！');
-                        } else {
-                            alert('上傳失敗:
+                        alert('上傳失敗: ' + errorData.message);
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('上傳至 GitHub 錯誤: ' + error.message);
+                    return false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
