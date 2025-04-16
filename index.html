@@ -123,13 +123,20 @@
         .single-page {
             background: white;
             border-radius: 15px;
-            padding: 20 CESTpx;
+            padding: 20px;
             max-width: 800px;
             margin: 20px auto;
         }
-        pre {
+        .text-content {
+            min-height: 100px;
             white-space: pre-wrap;
             word-wrap: break-word;
+        }
+        .carousel-container {
+            min-height: 200px;
+        }
+        .service-grid {
+            min-height: 200px;
         }
         @media (max-width: 768px) {
             .banner {
@@ -158,6 +165,9 @@
             .contact-float a {
                 padding: 6px;
                 font-size: 0.9rem;
+            }
+            iframe {
+                height: 48px;
             }
         }
     </style>
@@ -197,18 +207,19 @@
             <!-- 首頁 -->
             <section id="home" class="page-content">
                 <!-- 輪播 -->
-                <div class="carousel relative bg-white rounded-lg shadow-lg p-6 mb-8">
+                <div class="carousel relative bg-white rounded-lg shadow-lg p-6 mb-8 carousel-container">
                     <div id="carousel-items" class="flex flex-col items-center">
                         <!-- 動態插入輪播內容 -->
                     </div>
-                    <button id="prev-btn" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full">❮</button>
-                    <button id="next-btn" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full">❯</button>
+                    <button id="prev-btn" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hidden">❮</button>
+                    <button id="next-btn" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hidden">❯</button>
                 </div>
 
                 <!-- 借款須知 -->
                 <div class="bg-white rounded-lg shadow-lg p-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">借款須知</h2>
-                    <pre id="index-content" class="text-gray-700 leading-relaxed"></pre>
+                    <div id="index-content" class="text-gray-700 leading-relaxed text-content"></div>
+                    <iframe class="w-full h-64 rounded-lg mt-6" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.9728964134636!2d121.51168581500674!3d25.03497298396453!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a946d5171e7f%3A0x5b4f6d6c6d6d6d6d!2sTaipei%20228%20Memorial%20Park!5e0!3m2!1szh-TW!2stw!4v1634567890123" allowfullscreen="" loading="lazy"></iframe>
                 </div>
             </section>
 
@@ -216,6 +227,7 @@
             <section id="news" class="page-content hidden">
                 <div id="blog-posts" class="bg-white rounded-lg shadow-lg p-6">
                     <!-- 動態插入部落格文章 -->
+                    <div id="news-content" class="text-gray-700 leading-relaxed text-content"></div>
                 </div>
             </section>
 
@@ -230,7 +242,7 @@
             <section id="about" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-lg p-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">關於我們</h2>
-                    <pre id="about-content" class="text-gray-700 leading-relaxed mb-6"></pre>
+                    <div id="about-content" class="text-gray-700 leading-relaxed text-content mb-6"></div>
                     <iframe class="w-full h-64 rounded-lg" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.9728964134636!2d121.51168581500674!3d25.03497298396453!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a946d5171e7f%3A0x5b4f6d6c6d6d6d6d!2sTaipei%20228%20Memorial%20Park!5e0!3m2!1szh-TW!2stw!4v1634567890123" allowfullscreen="" loading="lazy"></iframe>
                 </div>
             </section>
@@ -309,6 +321,11 @@
             });
         }
 
+        function toggleCarouselButtons(show) {
+            prevBtn.classList.toggle('hidden', !show);
+            nextBtn.classList.toggle('hidden', !show);
+        }
+
         prevBtn.addEventListener('click', () => {
             currentSlide = (currentSlide - 1 + articles.length) % articles.length;
             updateCarousel();
@@ -352,18 +369,24 @@
 
         // 載入首頁內容
         fetch('content/index.txt')
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) throw new Error('檔案未找到');
+                return response.text();
+            })
             .then(data => {
                 document.getElementById('index-content').textContent = data;
             })
             .catch(error => {
                 console.error('載入首頁內容失敗:', error);
-                document.getElementById('index-content').textContent = '無法載入借款須知，請稍後重試。';
+                document.getElementById('index-content').textContent = '尚未載入內容';
             });
 
         // 載入最新消息內容
         fetch('content/news.txt')
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) throw new Error('檔案未找到');
+                return response.text();
+            })
             .then(data => {
                 const articleArray = data.split('---').filter(content => content.trim() !== '');
                 articles = articleArray.map((content, index) => ({
@@ -371,57 +394,62 @@
                     image: `img/pic${index + 1}.jpg`
                 }));
 
-                // 首頁輪播
-                articles.forEach((article, index) => {
-                    const item = document.createElement('div');
-                    item.className = `carousel-item flex flex-col md:flex-row items-center gap-6 ${index === 0 ? 'active' : ''}`;
-                    item.innerHTML = `
-                        <img src="${article.image}" alt="台北當鋪文章圖片 ${index + 1}" class="w-full md:w-1/2 h-48 object-cover rounded-lg cursor-pointer">
-                        <div class="text-gray-700 cursor-pointer">${article.text.substring(0, 100)}...</div>
-                    `;
-                    item.addEventListener('click', () => showSingleArticle(index));
-                    carouselItems.appendChild(item);
-                });
+                if (articles.length > 0) {
+                    // 首頁輪播
+                    articles.forEach((article, index) => {
+                        const item = document.createElement('div');
+                        item.className = `carousel-item flex flex-col md:flex-row items-center gap-6 ${index === 0 ? 'active' : ''}`;
+                        item.innerHTML = `
+                            <img src="${article.image}" alt="台北當鋪文章圖片 ${index + 1}" class="w-full md:w-1/2 h-48 object-cover rounded-lg cursor-pointer">
+                            <div class="text-gray-700 cursor-pointer">${article.text.substring(0, 100)}...</div>
+                        `;
+                        item.addEventListener('click', () => showSingleArticle(index));
+                        carouselItems.appendChild(item);
+                    });
 
-                // 最新消息部落格
-                const blogPosts = document.getElementById('blog-posts');
-                articles.forEach((article, index) => {
-                    const post = document.createElement('div');
-                    post.className = 'mb-6 p-4 bg-gray-50 rounded-lg shadow article-card';
-                    post.innerHTML = `
-                        <img src="${article.image}" alt="台北當鋪文章圖片 ${index + 1}" class="w-full h-48 object-cover rounded-lg mb-4">
-                        <div class="text-gray-700">${article.text.substring(0, 100)}...</div>
-                    `;
-                    post.addEventListener('click', () => showSingleArticle(index));
-                    blogPosts.appendChild(post);
-                });
+                    // 最新消息部落格
+                    const blogPosts = document.getElementById('blog-posts');
+                    articles.forEach((article, index) => {
+                        const post = document.createElement('div');
+                        post.className = 'mb-6 p-4 bg-gray-50 rounded-lg shadow article-card';
+                        post.innerHTML = `
+                            <img src="${article.image}" alt="台北當鋪文章圖片 ${index + 1}" class="w-full h-48 object-cover rounded-lg mb-4">
+                            <div class="text-gray-700">${article.text.substring(0, 100)}...</div>
+                        `;
+                        post.addEventListener('click', () => showSingleArticle(index));
+                        blogPosts.appendChild(post);
+                    });
 
-                updateCarousel();
-                // 自動輪播
-                setInterval(() => {
-                    currentSlide = (currentSlide + 1) % articles.length;
+                    toggleCarouselButtons(true);
                     updateCarousel();
-                }, 5000);
+                    // 自動輪播
+                    setInterval(() => {
+                        currentSlide = (currentSlide + 1) % articles.length;
+                        updateCarousel();
+                    }, 5000);
+                } else {
+                    document.getElementById('news-content').textContent = '尚未載入內容';
+                    toggleCarouselButtons(false);
+                }
             })
-            .catch(error => console.error('載入最新消息失敗:', error));
+            .catch(error => {
+                console.error('載入最新消息失敗:', error);
+                document.getElementById('news-content').textContent = '尚未載入內容';
+                toggleCarouselButtons(false);
+            });
 
         // 載入服務內容
         let services = [];
         fetch('content/service.txt')
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) throw new Error('檔案未找到');
+                return response.text();
+            })
             .then(data => {
                 try {
                     services = JSON.parse(data);
                 } catch (e) {
-                    console.error('解析服務內容失敗:', e);
-                    services = [
-                        { title: "汽車借款", shortDescription: "快速審核，車輛照開，資金即到！", fullDescription: "我們的汽車借款服務提供免留車方案，最快當天放款，年利率低至 3.5%，靈活還款期限，讓您無壓力駕馭愛車。立即聯繫 XX 當鋪！", image: "img/service1.jpg" },
-                        { title: "機車借款", shortDescription: "即時放款，免留車，手續簡便。", fullDescription: "機車借款無需抵押車輛，手續簡單，現金即得。無論您是上班族或自由業者，最短 3 個月還款期，輕鬆應對緊急開支。", image: "img/service2.jpg" },
-                        { title: "房屋借款", shortDescription: "低利率，長還款期，輕鬆解決資金需求。", fullDescription: "房屋借款提供專業評估，年利率低至 3.5%，最長 5 年還款期，助您實現財務自由。不限職業，快速審批！", image: "img/service3.jpg" },
-                        { title: "助還代償", shortDescription: "整合債務，降低壓力，專業協助。", fullDescription: "助還代償幫您整合高利貸或信用卡債務，快速審批，客製化方案，降低還款壓力。XX 當鋪專業服務，立即諮詢！", image: "img/service4.jpg" },
-                        { title: "黃金鑽石典當", shortDescription: "高價收當，安全保密，快速兌現。", fullDescription: "黃金、鑽石典當提供專業鑑定，最高收購價，現金即得。位於台北市中心，服務快速又保密，立即兌現價值！", image: "img/service5.jpg" },
-                        { title: "現金信用貸款", shortDescription: "無需抵押，信用評估，靈活還款。", fullDescription: "現金信用貸款無需抵押，依據信用評估提供最高額度，年利率 3.5%-10%，最快當日撥款。XX 當鋪助您解決資金難題！", image: "img/service6.jpg" }
-                    ];
+                    throw new Error('JSON 解析失敗');
                 }
 
                 // 服務介紹方格
@@ -438,17 +466,44 @@
                     serviceGrid.appendChild(card);
                 });
             })
-            .catch(error => console.error('載入服務內容失敗:', error));
+            .catch(error => {
+                console.error('載入服務內容失敗:', error);
+                // 預設服務內容
+                services = [
+                    { title: "汽車借款", shortDescription: "快速審核，車輛照開，資金即到！", fullDescription: "我們的汽車借款服務提供免留車方案，最快當天放款，年利率低至 3.5%，靈活還款期限，讓您無壓力駕馭愛車。立即聯繫 XX 當鋪！", image: "img/service1.jpg" },
+                    { title: "機車借款", shortDescription: "即時放款，免留車，手續簡便。", fullDescription: "機車借款無需抵押車輛，手續簡單，現金即得。無論您是上班族或自由業者，最短 3 個月還款期，輕鬆應對緊急開支。", image: "img/service2.jpg" },
+                    { title: "房屋借款", shortDescription: "低利率，長還款期，輕鬆解決資金需求。", fullDescription: "房屋借款提供專業評估，年利率低至 3.5%，最長 5 年還款期，助您實現財務自由。不限職業，快速審批！", image: "img/service3.jpg" },
+                    { title: "助還代償", shortDescription: "整合債務，降低壓力，專業協助。", fullDescription: "助還代償幫您整合高利貸或信用卡債務，快速審批，客製化方案，降低還款壓力。XX 當鋪專業服務，立即諮詢！", image: "img/service4.jpg" },
+                    { title: "黃金鑽石典當", shortDescription: "高價收當，安全保密，快速兌現。", fullDescription: "黃金、鑽石典當提供專業鑑定，最高收購價，現金即得。位於台北市中心，服務快速又保密，立即兌現價值！", image: "img/service5.jpg" },
+                    { title: "現金信用貸款", shortDescription: "無需抵押，信用評估，靈活還款。", fullDescription: "現金信用貸款無需抵押，依據信用評估提供最高額度，年利率 3.5%-10%，最快當日撥款。XX 當鋪助您解決資金難題！", image: "img/service6.jpg" }
+                ];
+
+                const serviceGrid = document.getElementById('service-grid');
+                services.forEach((service, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'service-card bg-gray-50 rounded-lg p-4 text-center shadow';
+                    card.innerHTML = `
+                        <h3 class="text-xl font-semibold text-gray-800">${service.title}</h3>
+                        <p class="text-gray-600">${service.shortDescription}</p>
+                        <button class="mt-2 bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700">查看詳情</button>
+                    `;
+                    card.querySelector('button').addEventListener('click', () => showSingleService(index));
+                    serviceGrid.appendChild(card);
+                });
+            });
 
         // 載入關於我們內容
         fetch('content/about.txt')
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) throw new Error('檔案未找到');
+                return response.text();
+            })
             .then(data => {
                 document.getElementById('about-content').textContent = data;
             })
             .catch(error => {
                 console.error('載入關於我們內容失敗:', error);
-                document.getElementById('about-content').textContent = '無法載入關於我們，請稍後重試。';
+                document.getElementById('about-content').textContent = '尚未載入內容';
             });
     </script>
 </body>
