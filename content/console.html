@@ -1,0 +1,130 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row =>
+                    row.some(cell => cell !== '' && cell !== null && cell !== undefined)
+                );
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XX當鋪 - 後台管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to bottom, #f8e1b5, #d4a576);
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+        }
+        .error {
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="container mx-auto px-4 py-6 text-center">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">XX當鋪後台管理</h1>
+        <div class="mb-6">
+            <label class="block mb-2 text-gray-700">更新文章內容</label>
+            <input type="file" id="content-upload" accept=".txt" class="mb-4 p-2 border rounded">
+        </div>
+        <div class="mb-6">
+            <label class="block mb-2 text-gray-700">更新文章照片</label>
+            <select id="photo-select" class="mb-2 p-2 border rounded">
+                <option value="1">pic1.jpg</option>
+                <option value="2">pic2.jpg</option>
+                <option value="3">pic3.jpg</option>
+                <option value="4">pic4.jpg</option>
+                <option value="5">pic5.jpg</option>
+                <option value="6">pic6.jpg</option>
+                <option value="7">pic7.jpg</option>
+                <option value="8">pic8.jpg</option>
+                <option value="9">pic9.jpg</option>
+                <option value="10">pic10.jpg</option>
+            </select>
+            <input type="file" id="photo-upload" accept=".jpg" class="mb-4 p-2 border rounded">
+        </div>
+        <div class="mb-6">
+            <label for="password" class="block mb-2 text-gray-700">請輸入密碼</label>
+            <input type="password" id="password" class="p-2 border rounded w-full max-w-xs">
+            <p id="error-message" class="error mt-2">密碼錯誤，請重試！</p>
+        </div>
+        <button id="upload-btn" class="bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-yellow-700">上傳</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+    <script>
+        // MD5 加密的密碼雜湊值
+        const correctHash = '5f4dcc3b5aa765d61d8327deb882cf99'; // phpmyadmin 的 MD5
+        const contentUpload = document.getElementById('content-upload');
+        const photoUpload = document.getElementById('photo-upload');
+        const photoSelect = document.getElementById('photo-select');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('error-message');
+        const uploadBtn = document.getElementById('upload-btn');
+
+        uploadBtn.addEventListener('click', () => {
+            // 計算輸入密碼的 MD5 雜湊值
+            const inputHash = md5(passwordInput.value);
+            if (inputHash !== correctHash) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+            errorMessage.style.display = 'none';
+
+            if (contentUpload.files.length > 0) {
+                const file = contentUpload.files[0];
+                if (file.type !== 'text/plain') {
+                    alert('請上傳 .txt 檔案！');
+                    return;
+                }
+                // 模擬上傳（GitHub Pages 無後端）
+                console.log('模擬上傳 content.txt:', file.name);
+                alert('文章內容已模擬上傳！');
+            }
+
+            if (photoUpload.files.length > 0) {
+                const file = photoUpload.files[0];
+                if (!file.type.startsWith('image/jpeg')) {
+                    alert('請上傳 .jpg 檔案！');
+                    return;
+                }
+                const selectedPic = `pic${photoSelect.value}.jpg`;
+                // 模擬上傳
+                console.log(`模擬上傳 ${selectedPic}:`, file.name);
+                alert(`圖片 ${selectedPic} 已模擬上傳！`);
+            }
+        });
+    </script>
+</body>
+</html>
