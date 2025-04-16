@@ -360,17 +360,21 @@
             console.log('綁定更新網站名稱按鈕');
             console.log('綁定更新網站地址按鈕');
 
-            // 載入網站名稱
+            // 載入網站名稱（預設從 content/name.txt）
             fetch('content/name.txt')
-                .then(response => response.ok ? response.text() : Promise.reject('檔案未找到'))
+                .then(response => {
+                    if (!response.ok) throw new Error(`無法載入 name.txt，狀態碼: ${response.status}`);
+                    return response.text();
+                })
                 .then(data => {
                     const name = data.trim();
                     nameInput.value = name;
                     headerTitle.textContent = `${name}後台管理`;
                     consoleTitle.textContent = `${name} - 後台管理`;
+                    console.log('載入 name.txt 成功:', name);
                 })
                 .catch(error => {
-                    console.error('載入網站名稱失敗:', error);
+                    console.error('載入網站名稱失敗:', error.message);
                     nameInput.value = 'XX當鋪';
                     headerTitle.textContent = 'XX當鋪後台管理';
                     consoleTitle.textContent = 'XX當鋪 - 後台管理';
