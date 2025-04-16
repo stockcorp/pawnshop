@@ -49,6 +49,10 @@
             color: red;
             display: none;
         }
+        input[type="file"] {
+            width: 100%;
+            max-width: 300px;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen">
@@ -56,7 +60,7 @@
         <h1 class="text-2xl font-bold text-gray-800 mb-6">XX當鋪後台管理</h1>
         <div class="mb-6">
             <label class="block mb-2 text-gray-700">更新文章內容</label>
-            <input type="file" id="content-upload" accept=".txt" class="mb-4 p-2 border rounded">
+            <input type="file" id="content-upload" accept="text/plain,.txt" class="mb-4 p-2 border rounded">
         </div>
         <div class="mb-6">
             <label class="block mb-2 text-gray-700">更新文章照片</label>
@@ -72,7 +76,7 @@
                 <option value="9">pic9.jpg</option>
                 <option value="10">pic10.jpg</option>
             </select>
-            <input type="file" id="photo-upload" accept=".jpg" class="mb-4 p-2 border rounded">
+            <input type="file" id="photo-upload" accept="image/jpeg,image/jpg,.jpg" class="mb-4 p-2 border rounded">
         </div>
         <div class="mb-6">
             <label for="password" class="block mb-2 text-gray-700">請輸入密碼</label>
@@ -93,37 +97,73 @@
         const errorMessage = document.getElementById('error-message');
         const uploadBtn = document.getElementById('upload-btn');
 
+        // 檢查 MD5 庫是否載入
+        if (typeof md5 === 'undefined') {
+            console.error('MD5 庫未載入，請檢查網路或 CDN');
+            alert('無法載入加密功能，請稍後重試！');
+        } else {
+            console.log('MD5 庫載入成功');
+        }
+
         uploadBtn.addEventListener('click', () => {
+            console.log('點擊上傳按鈕，開始驗證');
+
             // 計算輸入密碼的 MD5 雜湊值
-            const inputHash = md5(passwordInput.value);
+            const inputValue = passwordInput.value.trim();
+            const inputHash = md5(inputValue);
+            console.log('輸入密碼:', inputValue, 'MD5 雜湊:', inputHash);
+
             if (inputHash !== correctHash) {
+                console.log('密碼驗證失敗');
                 errorMessage.style.display = 'block';
                 return;
             }
+            console.log('密碼驗證成功');
             errorMessage.style.display = 'none';
+
+            let uploaded = false;
 
             if (contentUpload.files.length > 0) {
                 const file = contentUpload.files[0];
-                if (file.type !== 'text/plain') {
+                console.log('選擇文章檔案:', file.name, '類型:', file.type);
+                if (!['text/plain', 'application/octet-stream'].includes(file.type) && !file.name.endsWith('.txt')) {
+                    console.log('文章檔案格式錯誤');
                     alert('請上傳 .txt 檔案！');
                     return;
                 }
-                // 模擬上傳（GitHub Pages 無後端）
+                // 模擬上傳
                 console.log('模擬上傳 content.txt:', file.name);
                 alert('文章內容已模擬上傳！');
+                uploaded = true;
+            } else {
+                console.log('未選擇文章檔案');
             }
 
             if (photoUpload.files.length > 0) {
                 const file = photoUpload.files[0];
-                if (!file.type.startsWith('image/jpeg')) {
+                console.log('選擇照片檔案:', file.name, '類型:', file.type);
+                if (!['image/jpeg', 'image/jpg'].includes(file.type) && !file.name.endsWith('.jpg')) {
+                    console.log('照片檔案格式錯誤');
                     alert('請上傳 .jpg 檔案！');
                     return;
                 }
                 const selectedPic = `pic${photoSelect.value}.jpg`;
-                // 模擬上傳
-                console.log(`模擬上傳 ${selectedPic}:`, file.name);
+                console.log('模擬上傳', selectedPic, ':', file.name);
                 alert(`圖片 ${selectedPic} 已模擬上傳！`);
+                uploaded = true;
+            } else {
+                console.log('未選擇照片檔案');
             }
+
+            if (!uploaded) {
+                console.log('無檔案選擇，提示用戶');
+                alert('請選擇要上傳的檔案！');
+            }
+        });
+
+        // 清除錯誤訊息
+        passwordInput.addEventListener('input', () => {
+            errorMessage.style.display = 'none';
         });
     </script>
 </body>
