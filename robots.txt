@@ -1,0 +1,1 @@
+User-agent: * Disallow: /content/ Disallow: /img/ Allow: /index.html
