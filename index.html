@@ -123,9 +123,13 @@
         .single-page {
             background: white;
             border-radius: 15px;
-            padding: 20px;
+            padding: 20 CESTpx;
             max-width: 800px;
             margin: 20px auto;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
         @media (max-width: 768px) {
             .banner {
@@ -201,28 +205,10 @@
                     <button id="next-btn" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full">❯</button>
                 </div>
 
-                <!-- 新借款須知 -->
+                <!-- 借款須知 -->
                 <div class="bg-white rounded-lg shadow-lg p-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">借款須知</h2>
-                    <p class="text-gray-700 leading-relaxed">
-                        歡迎選擇 XX 當鋪，我們提供快速、透明的借款服務，幫助您輕鬆應對資金需求！以下是我們的借款條件與說明：<br>
-                        <ul class="list-disc pl-6 my-4">
-                            <li>適用對象：年滿 20 歲至 65 歲的台灣居民，無職業限制，學生、上班族或自由業者皆可申請。</li>
-                            <li>借款額度：最低 TWD 10,000，最高依抵押品價值評估，最高可達 TWD 5,000,000。</li>
-                            <li>還款期限：靈活選擇 3 個月至 3 年，按月計息，無提前還款罰金。</li>
-                            <li>利率：年利率 3.5% 至 10%，依您的信用與抵押品狀況評估，月息最低 TWD 80/萬元。</li>
-                            <li>費用：無任何手續費或隱藏費用，借多少拿多少。</li>
-                            <li>注意事項：請按時繳款以維護信用，逾期將加計 1% 滯納金，並可能影響未來借款資格。</li>
-                        </ul>
-                        <strong>範例說明：</strong><br>
-                        假設您借款 TWD 50,000，年利率 6%（月息 0.5%），每月利息 TWD 250：<br>
-                        - 3 個月還款：本金 TWD 50,000 + 利息 TWD 750 = 總計 TWD 50,750。<br>
-                        - 6 個月還款：本金 TWD 50,000 + 利息 TWD 1,500 = 總計 TWD 51,500。<br>
-                        - 僅繳利息：每月 TWD 250，可延長借款期限，隨時還本無違約金。<br><br>
-                        <strong>成功案例：</strong><br>
-                        張先生因創業急需資金，於 2024 年 6 月以機車借款 TWD 30,000，月利息 TWD 150。他每月支付利息，8 月生意好轉後一次還清本金，總計支付 TWD 30,300（本金 + 2 個月利息）。張先生讚賞 XX 當鋪的透明流程，推薦給朋友！<br><br>
-                        立即聯繫 XX 當鋪，位於台北 228 紀念公園旁，專業服務助您無憂借款！
-                    </p>
+                    <pre id="index-content" class="text-gray-700 leading-relaxed"></pre>
                 </div>
             </section>
 
@@ -244,9 +230,7 @@
             <section id="about" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-lg p-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">關於我們</h2>
-                    <p class="text-gray-700 leading-relaxed mb-6">
-                        XX當鋪成立於台北市，位於228紀念公園附近，秉持「誠信、專業、快速」的服務理念，為客戶提供多元化的借款與典當服務。無論是汽車、機車、房屋借款，還是黃金、鑽石典當，我們以透明的利率和靈活的還款方案，幫助您解決資金需求。我們的團隊由經驗豐富的專業人士組成，確保每位客戶都能感受到安全、便利的服務體驗。歡迎蒞臨或聯繫我們，XX當鋪是您值得信賴的財務夥伴！
-                    </p>
+                    <pre id="about-content" class="text-gray-700 leading-relaxed mb-6"></pre>
                     <iframe class="w-full h-64 rounded-lg" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.9728964134636!2d121.51168581500674!3d25.03497298396453!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a946d5171e7f%3A0x5b4f6d6c6d6d6d6d!2sTaipei%20228%20Memorial%20Park!5e0!3m2!1szh-TW!2stw!4v1634567890123" allowfullscreen="" loading="lazy"></iframe>
                 </div>
             </section>
@@ -366,8 +350,19 @@
             switchPage('services');
         });
 
-        // 載入文章內容
-        fetch('content/content.txt')
+        // 載入首頁內容
+        fetch('content/index.txt')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('index-content').textContent = data;
+            })
+            .catch(error => {
+                console.error('載入首頁內容失敗:', error);
+                document.getElementById('index-content').textContent = '無法載入借款須知，請稍後重試。';
+            });
+
+        // 載入最新消息內容
+        fetch('content/news.txt')
             .then(response => response.text())
             .then(data => {
                 const articleArray = data.split('---').filter(content => content.trim() !== '');
@@ -408,7 +403,7 @@
                     updateCarousel();
                 }, 5000);
             })
-            .catch(error => console.error('載入文章失敗:', error));
+            .catch(error => console.error('載入最新消息失敗:', error));
 
         // 載入服務內容
         let services = [];
@@ -444,6 +439,17 @@
                 });
             })
             .catch(error => console.error('載入服務內容失敗:', error));
+
+        // 載入關於我們內容
+        fetch('content/about.txt')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('about-content').textContent = data;
+            })
+            .catch(error => {
+                console.error('載入關於我們內容失敗:', error);
+                document.getElementById('about-content').textContent = '無法載入關於我們，請稍後重試。';
+            });
     </script>
 </body>
 </html>
