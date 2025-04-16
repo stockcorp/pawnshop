@@ -181,7 +181,7 @@
                             alert('文章內容上傳失敗，請檢查 Token 或網路！');
                         }
                     } catch (error) {
-                        console.error('上傳 content.txt 錯誤:', error);
+                        console.error('上傳 content.txt 錯誤:', error.message);
                         alert('上傳文章內容時發生錯誤：' + error.message);
                     }
                 } else {
@@ -207,15 +207,15 @@
                         const selectedPic = `img/pic${photoSelect.value}.jpg`;
                         const uploadSuccess = await uploadToGitHub(token, selectedPic, base64Content, file.name);
                         if (uploadSuccess) {
-                            console.log('上傳', selectedPic, '成功');
-                            alert(`圖片 ${selectedPic} 已成功上傳！`);
+                            console.log('上傳 ' + selectedPic + ' 成功');
+                            alert('圖片 ' + selectedPic + ' 已成功上傳！');
                             uploaded = true;
                         } else {
-                            console.log('上傳', selectedPic, '失敗');
-                            alert(`圖片 ${selectedPic} 上傳失敗，請檢查 Token 或網路！');
+                            console.log('上傳 ' + selectedPic + ' 失敗');
+                            alert('圖片 ' + selectedPic + ' 上傳失敗，請檢查 Token 或網路！');
                         }
                     } catch (error) {
-                        console.error('上傳', selectedPic, '錯誤:', error);
+                        console.error('上傳 ' + selectedPic + ' 錯誤:', error.message);
                         alert('上傳圖片時發生錯誤：' + error.message);
                     }
                 } else {
@@ -261,7 +261,7 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            message: `上傳 ${fileName}`,
+                            message: '上傳 ' + fileName,
                             content: base64Content,
                             sha: sha
                         })
@@ -272,12 +272,12 @@
                         return true;
                     } else {
                         const errorData = await response.json();
-                        console.error('GitHub API 上傳失敗:', errorData);
+                        console.error('GitHub API 上傳失敗:', errorData.message);
                         alert('上傳失敗: ' + (errorData.message || '未知錯誤'));
                         return false;
                     }
                 } catch (error) {
-                    console.error('上傳至 GitHub 錯誤:', error);
+                    console.error('上傳至 GitHub 錯誤:', error.message);
                     throw error;
                 }
             }
