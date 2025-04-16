@@ -138,6 +138,12 @@
         .service-grid {
             min-height: 200px;
         }
+        #facebook-contact, #facebook-float { background-color: #3b5998; }
+        #phone-contact, #phone-float { background-color: #EF4444; }
+        #line-contact, #line-float { background-color: #00B900; }
+        #x-contact, #x-float { background-color: #000000; }
+        #instagram-contact, #instagram-float { background-color: #E1306C; }
+        .hidden { display: none; }
         @media (max-width: 768px) {
             .banner {
                 height: 200px;
@@ -255,6 +261,8 @@
                         <a id="facebook-contact" href="https://www.facebook.com/yourpawnshop" target="_blank" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700">XX當鋪 (Facebook)</a>
                         <a id="phone-contact" href="tel:+886123456789" class="bg-red-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-red-700">XX當鋪 (電話)</a>
                         <a id="line-contact" href="https://line.me/ti/p/your-line-id" target="_blank" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">XX當鋪 (Line)</a>
+                        <a id="x-contact" href="https://x.com/example" target="_blank" class="bg-black text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-800">XX當鋪 (X)</a>
+                        <a id="instagram-contact" href="https://www.instagram.com/example" target="_blank" class="bg-pink-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-pink-700">XX當鋪 (Instagram)</a>
                     </div>
                     <iframe class="w-full h-64 rounded-lg" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.9728964134636!2d121.51168581500674!3d25.03497298396453!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a946d5171e7f%3A0x5b4f6d6c6d6d6d6d!2sTaipei%20228%20Memorial%20Park!5e0!3m2!1szh-TW!2stw!4v1634567890123" allowfullscreen="" loading="lazy"></iframe>
                 </div>
@@ -287,6 +295,8 @@
             <a id="facebook-float" href="https://www.facebook.com/yourpawnshop" target="_blank" class="bg-blue-600">XX當鋪 (Facebook)</a>
             <a id="phone-float" href="tel:+886123456789" class="bg-red-600">XX當鋪 (電話)</a>
             <a id="line-float" href="https://line.me/ti/p/your-line-id" target="_blank" class="bg-green-600">XX當鋪 (Line)</a>
+            <a id="x-float" href="https://x.com/example" target="_blank" class="bg-black">XX當鋪 (X)</a>
+            <a id="instagram-float" href="https://www.instagram.com/example" target="_blank" class="bg-pink-600">XX當鋪 (Instagram)</a>
         </div>
     </div>
 
@@ -381,9 +391,6 @@
             document.getElementById('about-title').textContent = `關於我們`;
             document.getElementById('contact-title').textContent = `聯絡我們`;
             document.getElementById('footer-text').textContent = `@2025年 ${name} 保留最後權利`;
-            document.querySelectorAll('#facebook-contact, #phone-contact, #line-contact, #facebook-float, #phone-float, #line-float').forEach(el => {
-                el.textContent = `${name} (${el.id.includes('facebook') ? 'Facebook' : el.id.includes('phone') ? '電話' : 'Line'})`;
-            });
             updateContactLinks();
         }
 
@@ -418,9 +425,11 @@
 
         // 載入聯絡資訊
         let contactInfo = {
-            facebook: "https://www.facebook.com/yourpawnshop",
-            phone: "tel:+886123456789",
-            line: "https://line.me/ti/p/your-line-id"
+            facebook: "",
+            phone: "",
+            line: "",
+            x: "",
+            instagram: ""
         };
         fetch('content/contact.txt')
             .then(response => {
@@ -441,12 +450,48 @@
             });
 
         function updateContactLinks() {
-            document.getElementById('facebook-contact').href = contactInfo.facebook;
-            document.getElementById('phone-contact').href = contactInfo.phone;
-            document.getElementById('line-contact').href = contactInfo.line;
-            document.getElementById('facebook-float').href = contactInfo.facebook;
-            document.getElementById('phone-float').href = contactInfo.phone;
-            document.getElementById('line-float').href = contactInfo.line;
+            // 更新聯絡我們按鈕
+            document.getElementById('facebook-contact').href = contactInfo.facebook || '#';
+            document.getElementById('phone-contact').href = contactInfo.phone || '#';
+            document.getElementById('line-contact').href = contactInfo.line || '#';
+            document.getElementById('x-contact').href = contactInfo.x || '#';
+            document.getElementById('instagram-contact').href = contactInfo.instagram || '#';
+
+            // 更新浮動按鈕
+            document.getElementById('facebook-float').href = contactInfo.facebook || '#';
+            document.getElementById('phone-float').href = contactInfo.phone || '#';
+            document.getElementById('line-float').href = contactInfo.line || '#';
+            document.getElementById('x-float').href = contactInfo.x || '#';
+            document.getElementById('instagram-float').href = contactInfo.instagram || '#';
+
+            // 動態顯示按鈕
+            document.getElementById('facebook-contact').classList.toggle('hidden', !contactInfo.facebook);
+            document.getElementById('phone-contact').classList.toggle('hidden', !contactInfo.phone);
+            document.getElementById('line-contact').classList.toggle('hidden', !contactInfo.line);
+            document.getElementById('x-contact').classList.toggle('hidden', !contactInfo.x);
+            document.getElementById('instagram-contact').classList.toggle('hidden', !contactInfo.instagram);
+
+            document.getElementById('facebook-float').classList.toggle('hidden', !contactInfo.facebook);
+            document.getElementById('phone-float').classList.toggle('hidden', !contactInfo.phone);
+            document.getElementById('line-float').classList.toggle('hidden', !contactInfo.line);
+            document.getElementById('x-float').classList.toggle('hidden', !contactInfo.x);
+            document.getElementById('instagram-float').classList.toggle('hidden', !contactInfo.instagram);
+
+            // 更新聯絡我們按鈕文字
+            document.getElementById('facebook-contact').textContent = `${siteName} (Facebook)`;
+            document.getElementById('phone-contact').textContent = `${siteName} (電話)`;
+            document.getElementById('line-contact').textContent = `${siteName} (Line)`;
+            document.getElementById('x-contact').textContent = `${siteName} (X)`;
+            document.getElementById('instagram-contact').textContent = `${siteName} (Instagram)`;
+
+            // 更新浮動按鈕文字
+            document.getElementById('facebook-float').textContent = `${siteName} (Facebook)`;
+            document.getElementById('phone-float').textContent = `${siteName} (電話)`;
+            document.getElementById('line-float').textContent = `${siteName} (Line)`;
+            document.getElementById('x-float').textContent = `${siteName} (X)`;
+            document.getElementById('instagram-float').textContent = `${siteName} (Instagram)`;
+
+            // 更新分享連結
             document.getElementById('facebook-share').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}`;
             document.getElementById('x-share').href = `https://x.com/intent/tweet?url=${encodeURIComponent(siteUrl)}`;
             document.getElementById('instagram-share').href = `https://www.instagram.com/?url=${encodeURIComponent(siteUrl)}`;
@@ -576,20 +621,6 @@
                     card.querySelector('button').addEventListener('click', () => showSingleService(index));
                     serviceGrid.appendChild(card);
                 });
-            });
-
-        // 載入關於我們內容
-        fetch('content/about.txt')
-            .then(response => {
-                if (!response.ok) throw new Error('檔案未找到');
-                return response.text();
-            })
-            .then(data => {
-                document.getElementById('about-content').textContent = data;
-            })
-            .catch(error => {
-                console.error('載入關於我們內容失敗:', error);
-                document.getElementById('about-content').textContent = '尚未載入內容';
             });
     </script>
 </body>
