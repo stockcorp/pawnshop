@@ -187,16 +187,16 @@
             <button class="nav-btn bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-md" data-page="about">關於我們</button>
             <button class="nav-btn bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-md" data-page="contact">聯絡我們</button>
             <div class="share-buttons">
-                <a href="https://www.facebook.com/sharer/sharer.php?u=https://stockcorp.github.io/pawnshop" target="_blank" class="share-button facebook">
+                <a id="facebook-share" href="https://www.facebook.com/sharer/sharer.php?u=https://stockcorp.github.io/pawnshop" target="_blank" class="share-button facebook">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/10.0.0/facebook.svg" alt="Facebook Share" width="32" height="32">
                 </a>
-                <a href="https://x.com/intent/tweet?url=https://stockcorp.github.io/pawnshop" target="_blank" class="share-button x">
+                <a id="x-share" href="https://x.com/intent/tweet?url=https://stockcorp.github.io/pawnshop" target="_blank" class="share-button x">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/10.0.0/x.svg" alt="X Share" width="32" height="32">
                 </a>
-                <a href="https://www.instagram.com/?url=https://stockcorp.github.io/pawnshop" target="_blank" class="share-button instagram">
+                <a id="instagram-share" href="https://www.instagram.com/?url=https://stockcorp.github.io/pawnshop" target="_blank" class="share-button instagram">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/10.0.0/instagram.svg" alt="Instagram Share" width="32" height="32">
                 </a>
-                <a href="https://line.me/R/msg/text/?探索XX當鋪快速借款服務！%0D%0Ahttps://stockcorp.github.io/pawnshop" target="_blank" class="share-button line">
+                <a id="line-share" href="https://line.me/R/msg/text/?探索XX當鋪快速借款服務！%0D%0Ahttps://stockcorp.github.io/pawnshop" target="_blank" class="share-button line">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/10.0.0/line.svg" alt="Line Share" width="32" height="32">
                 </a>
             </div>
@@ -252,9 +252,9 @@
                 <div class="bg-white rounded-lg shadow-lg p-6 text-center">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">聯絡我們</h2>
                     <div class="flex flex-wrap justify-center gap-4 mb-6">
-                        <a href="https://www.facebook.com/yourpawnshop" target="_blank" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700">XX當鋪 (Facebook)</a>
-                        <a href="tel:+886123456789" class="bg-red-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-red-700">XX當鋪 (電話)</a>
-                        <a href="https://line.me/ti/p/your-line-id" target="_blank" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">XX當鋪 (Line)</a>
+                        <a id="facebook-contact" href="https://www.facebook.com/yourpawnshop" target="_blank" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700">XX當鋪 (Facebook)</a>
+                        <a id="phone-contact" href="tel:+886123456789" class="bg-red-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-red-700">XX當鋪 (電話)</a>
+                        <a id="line-contact" href="https://line.me/ti/p/your-line-id" target="_blank" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">XX當鋪 (Line)</a>
                     </div>
                     <iframe class="w-full h-64 rounded-lg" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.9728964134636!2d121.51168581500674!3d25.03497298396453!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a946d5171e7f%3A0x5b4f6d6c6d6d6d6d!2sTaipei%20228%20Memorial%20Park!5e0!3m2!1szh-TW!2stw!4v1634567890123" allowfullscreen="" loading="lazy"></iframe>
                 </div>
@@ -284,9 +284,9 @@
 
         <!-- 右下角浮動聯絡我們 -->
         <div class="contact-float">
-            <a href="https://www.facebook.com/yourpawnshop" target="_blank" class="bg-blue-600">XX當鋪 (Facebook)</a>
-            <a href="tel:+886123456789" class="bg-red-600">XX當鋪 (電話)</a>
-            <a href="https://line.me/ti/p/your-line-id" target="_blank" class="bg-green-600">XX當鋪 (Line)</a>
+            <a id="facebook-float" href="https://www.facebook.com/yourpawnshop" target="_blank" class="bg-blue-600">XX當鋪 (Facebook)</a>
+            <a id="phone-float" href="tel:+886123456789" class="bg-red-600">XX當鋪 (電話)</a>
+            <a id="line-float" href="https://line.me/ti/p/your-line-id" target="_blank" class="bg-green-600">XX當鋪 (Line)</a>
         </div>
     </div>
 
@@ -366,6 +366,43 @@
         document.getElementById('service-back-btn').addEventListener('click', () => {
             switchPage('services');
         });
+
+        // 載入聯絡資訊
+        let contactInfo = {
+            facebook: "https://www.facebook.com/yourpawnshop",
+            phone: "tel:+886123456789",
+            line: "https://line.me/ti/p/your-line-id"
+        };
+        fetch('content/contact.txt')
+            .then(response => {
+                if (!response.ok) throw new Error('檔案未找到');
+                return response.text();
+            })
+            .then(data => {
+                try {
+                    contactInfo = JSON.parse(data);
+                } catch (e) {
+                    console.error('解析聯絡資訊失敗:', e);
+                }
+                updateContactLinks();
+            })
+            .catch(error => {
+                console.error('載入聯絡資訊失敗:', error);
+                updateContactLinks();
+            });
+
+        function updateContactLinks() {
+            document.getElementById('facebook-contact').href = contactInfo.facebook;
+            document.getElementById('phone-contact').href = contactInfo.phone;
+            document.getElementById('line-contact').href = contactInfo.line;
+            document.getElementById('facebook-float').href = contactInfo.facebook;
+            document.getElementById('phone-float').href = contactInfo.phone;
+            document.getElementById('line-float').href = contactInfo.line;
+            document.getElementById('facebook-share').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+            document.getElementById('x-share').href = `https://x.com/intent/tweet?url=${encodeURIComponent(window.location.href)}`;
+            document.getElementById('instagram-share').href = `https://www.instagram.com/?url=${encodeURIComponent(window.location.href)}`;
+            document.getElementById('line-share').href = `https://line.me/R/msg/text/?探索XX當鋪快速借款服務！%0D%0A${encodeURIComponent(window.location.href)}`;
+        }
 
         // 載入首頁內容
         fetch('content/index.txt')
