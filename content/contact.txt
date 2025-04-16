@@ -1,5 +1,7 @@
 {
-  "facebook": "https://www.facebook.com/yourpawnshop",
-  "phone": "tel:0911222333",
-  "line": "https://line.me/ti/p/your-line-id"
+  "facebook": "https://www.facebook.com/example",
+  "phone": "tel:+886912345678",
+  "line": "https://line.me/ti/p/example",
+  "x": "https://x.com/example",
+  "instagram": "https://www.instagram.com/example"
 }
