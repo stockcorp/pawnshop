@@ -52,11 +52,11 @@
             transition: all 0.3s ease;
         }
         .nav-btn:hover {
-            background-color: #4A90E2;
+            background-color: #d4a017;
             transform: translateY(-2px);
         }
         .nav-btn.active {
-            background-color: #2563EB;
+            background-color: #8b5a2b;
             color: white;
         }
         .carousel-item {
@@ -181,11 +181,11 @@
 
         <!-- 導航欄與分享按鈕 -->
         <nav class="flex flex-wrap justify-center gap-4 mb-8 items-center">
-            <button class="nav-btn bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md active" data-page="home">首頁</button>
-            <button class="nav-btn bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md" data-page="news">最新消息</button>
-            <button class="nav-btn bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md" data-page="services">服務介紹</button>
-            <button class="nav-btn bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md" data-page="about">關於我們</button>
-            <button class="nav-btn bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md" data-page="contact">聯絡我們</button>
+            <button class="nav-btn bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-md active" data-page="home">首頁</button>
+            <button class="nav-btn bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-md" data-page="news">最新消息</button>
+            <button class="nav-btn bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-md" data-page="services">服務介紹</button>
+            <button class="nav-btn bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-md" data-page="about">關於我們</button>
+            <button class="nav-btn bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-md" data-page="contact">聯絡我們</button>
             <div class="share-buttons">
                 <a id="facebook-share" href="https://www.facebook.com/sharer/sharer.php?u=https://stockcorp.github.io/pawnshop" target="_blank" class="share-button facebook">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/10.0.0/facebook.svg" alt="Facebook Share" width="32" height="32">
@@ -367,8 +367,9 @@
             switchPage('services');
         });
 
-        // 網站名稱
+        // 網站名稱與地址
         let siteName = 'XX當鋪';
+        let siteUrl = 'https://stockcorp.github.io/pawnshop';
         function updateSiteName(name) {
             siteName = name;
             document.getElementById('page-title').textContent = `${name} - 快速借款與典當服務`;
@@ -381,8 +382,9 @@
             document.getElementById('contact-title').textContent = `聯絡我們`;
             document.getElementById('footer-text').textContent = `@2025年 ${name} 保留最後權利`;
             document.querySelectorAll('#facebook-contact, #phone-contact, #line-contact, #facebook-float, #phone-float, #line-float').forEach(el => {
-                el.textContent = `${name} (${el.textContent.includes('Facebook') ? 'Facebook' : el.textContent.includes('電話') ? '電話' : 'Line'})`;
+                el.textContent = `${name} (${el.id.includes('facebook') ? 'Facebook' : el.id.includes('phone') ? '電話' : 'Line'})`;
             });
+            updateContactLinks();
         }
 
         fetch('content/name.txt')
@@ -396,6 +398,22 @@
             .catch(error => {
                 console.error('載入網站名稱失敗:', error);
                 updateSiteName('XX當鋪');
+            });
+
+        // 載入網站地址
+        fetch('content/website.txt')
+            .then(response => {
+                if (!response.ok) throw new Error('檔案未找到');
+                return response.text();
+            })
+            .then(data => {
+                siteUrl = data.trim();
+                updateContactLinks();
+            })
+            .catch(error => {
+                console.error('載入網站地址失敗:', error);
+                siteUrl = 'https://stockcorp.github.io/pawnshop';
+                updateContactLinks();
             });
 
         // 載入聯絡資訊
@@ -429,10 +447,10 @@
             document.getElementById('facebook-float').href = contactInfo.facebook;
             document.getElementById('phone-float').href = contactInfo.phone;
             document.getElementById('line-float').href = contactInfo.line;
-            document.getElementById('facebook-share').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
-            document.getElementById('x-share').href = `https://x.com/intent/tweet?url=${encodeURIComponent(window.location.href)}`;
-            document.getElementById('instagram-share').href = `https://www.instagram.com/?url=${encodeURIComponent(window.location.href)}`;
-            document.getElementById('line-share').href = `https://line.me/R/msg/text/?探索${encodeURIComponent(siteName)}快速借款服務！%0D%0A${encodeURIComponent(window.location.href)}`;
+            document.getElementById('facebook-share').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}`;
+            document.getElementById('x-share').href = `https://x.com/intent/tweet?url=${encodeURIComponent(siteUrl)}`;
+            document.getElementById('instagram-share').href = `https://www.instagram.com/?url=${encodeURIComponent(siteUrl)}`;
+            document.getElementById('line-share').href = `https://line.me/R/msg/text/?探索${encodeURIComponent(siteName)}快速借款服務！%0D%0A${encodeURIComponent(siteUrl)}`;
         }
 
         // 載入首頁內容
@@ -528,7 +546,7 @@
                     card.innerHTML = `
                         <h3 class="text-xl font-semibold text-gray-800">${service.title}</h3>
                         <p class="text-gray-600">${service.shortDescription}</p>
-                        <button class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">查看詳情</button>
+                        <button class="mt-2 bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700">查看詳情</button>
                     `;
                     card.querySelector('button').addEventListener('click', () => showSingleService(index));
                     serviceGrid.appendChild(card);
@@ -553,7 +571,7 @@
                     card.innerHTML = `
                         <h3 class="text-xl font-semibold text-gray-800">${service.title}</h3>
                         <p class="text-gray-600">${service.shortDescription}</p>
-                        <button class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">查看詳情</button>
+                        <button class="mt-2 bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700">查看詳情</button>
                     `;
                     card.querySelector('button').addEventListener('click', () => showSingleService(index));
                     serviceGrid.appendChild(card);
