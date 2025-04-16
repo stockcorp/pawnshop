@@ -236,9 +236,9 @@
                         const errorData = await response.json();
                         console.error('GitHub API 上傳失敗: ' + errorData.message);
                         if (errorData.message.includes('Not Found')) {
-                            alert('上傳失敗: 倉庫或檔案不存在，請確認 stockcorp/pawnshop 是否正確！');
+                            alert('上傳失敗: 倉庫 stockcorp/pawnshop 不存在或檔案路徑無效！');
                         } else if (errorData.message.includes('Invalid token')) {
-                            alert('上傳失敗: 無效的 GitHub Token！');
+                            alert('上傳失敗: 無效的 GitHub Token，請確認權限！');
                         } else {
                             alert('上傳失敗: ' + errorData.message);
                         }
