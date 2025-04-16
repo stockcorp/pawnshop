@@ -34,6 +34,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XX當鋪 - 後台管理</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
             background: linear-gradient(to bottom, #f8e1b5, #d4a576);
@@ -121,7 +122,7 @@
             margin-top: 8px;
             font-size: 0.9rem;
         }
-        .upload-btn {
+        .upload-btn, .update-contact-btn {
             display: block;
             width: 200px;
             margin: 30px auto 0;
@@ -134,9 +135,21 @@
             cursor: pointer;
             transition: background 0.2s ease, transform 0.2s ease;
         }
-        .upload-btn:hover {
+        .upload-btn:hover, .update-contact-btn:hover {
             background: #b8860b;
             transform: scale(1.05);
+        }
+        .download-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .download-section a {
+            color: #d4a017;
+            font-weight: 500;
+            text-decoration: underline;
+        }
+        .download-section a:hover {
+            color: #b8860b;
         }
         @media (max-width: 768px) {
             .container {
@@ -155,7 +168,7 @@
                 flex-direction: column;
                 gap: 10px;
             }
-            .upload-btn {
+            .upload-btn, .update-contact-btn {
                 width: 100%;
             }
         }
@@ -183,7 +196,7 @@
                 <div class="card">
                     <h2>更新首頁</h2>
                     <div class="input-group">
-                        <label>上傳首頁內容（index.txt）</label>
+                        <label>上傳首頁內容（必須為 index.txt）</label>
                         <input type="file" id="index-upload" accept="text/plain,.txt">
                     </div>
                 </div>
@@ -192,7 +205,7 @@
                 <div class="card">
                     <h2>更新最新消息</h2>
                     <div class="input-group">
-                        <label>上傳文字內容（news.txt）</label>
+                        <label>上傳文字內容（必須為 news.txt）</label>
                         <input type="file" id="news-upload" accept="text/plain,.txt">
                     </div>
                     <div class="input-group">
@@ -209,7 +222,7 @@
                 <div class="card">
                     <h2>更新服務介紹</h2>
                     <div class="input-group">
-                        <label>上傳文字內容（service.txt）</label>
+                        <label>上傳文字內容（必須為 service.txt）</label>
                         <input type="file" id="service-upload" accept="text/plain,.txt">
                     </div>
                     <div class="input-group">
@@ -230,8 +243,35 @@
                 <div class="card">
                     <h2>更新關於我們</h2>
                     <div class="input-group">
-                        <label>上傳內容（about.txt）</label>
+                        <label>上傳內容（必須為 about.txt）</label>
                         <input type="file" id="about-upload" accept="text/plain,.txt">
+                    </div>
+                </div>
+
+                <!-- 更新聯絡資訊 -->
+                <div class="card">
+                    <h2>更新聯絡資訊</h2>
+                    <div class="input-group">
+                        <label>Facebook 連結</label>
+                        <input type="text" id="facebook-input" placeholder="輸入 Facebook 連結">
+                    </div>
+                    <div class="input-group">
+                        <label>電話號碼</label>
+                        <input type="text" id="phone-input" placeholder="輸入電話號碼 (例如 +886123456789)">
+                    </div>
+                    <div class="input-group">
+                        <label>Line 連結</label>
+                        <input type="text" id="line-input" placeholder="輸入 Line 連結">
+                    </div>
+                    <button id="update-contact-btn" class="update-contact-btn">更新聯絡資訊</button>
+                </div>
+
+                <!-- 網站初始化內容 -->
+                <div class="card">
+                    <h2>網站初始化內容</h2>
+                    <div class="download-section">
+                        <p>若 .txt 檔案遺失或內容出現問題，請下載初始化檔案，解壓縮後重新上傳至對應欄位。</p>
+                        <a href="/content/ini.zip" download>下載初始化檔案 (ini.zip)</a>
                     </div>
                 </div>
             </div>
@@ -253,6 +293,10 @@
             const servicePhotoUpload = document.getElementById('service-photo-upload');
             const servicePhotoSelect = document.getElementById('service-photo-select');
             const aboutUpload = document.getElementById('about-upload');
+            const facebookInput = document.getElementById('facebook-input');
+            const phoneInput = document.getElementById('phone-input');
+            const lineInput = document.getElementById('line-input');
+            const updateContactBtn = document.getElementById('update-contact-btn');
             const errorMessage = document.getElementById('error-message');
             const uploadBtn = document.getElementById('upload-btn');
 
@@ -276,6 +320,75 @@
             // 初始化照片下拉選單（預設 10）
             updatePhotoSelect(10);
 
+            // 輸入驗證（防止 XSS）
+            function sanitizeInput(input) {
+                const div = document.createElement('div');
+                div.textContent = input;
+                return div.innerHTML;
+            }
+
+            function validateUrl(url) {
+                const regex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+                return regex.test(url);
+            }
+
+            function validatePhone(phone) {
+                const regex = /^\+?\d{1,4}?\s?\d{6,14}$/;
+                return regex.test(phone);
+            }
+
+            // 更新聯絡資訊
+            updateContactBtn.addEventListener('click', async () => {
+                console.log('點擊更新聯絡資訊按鈕');
+                const token = githubTokenInput.value.replace(/\s+/g, '');
+                if (!token) {
+                    console.log('未輸入 PAT');
+                    errorMessage.textContent = '請輸入有效的 PAT！';
+                    errorMessage.style.display = 'block';
+                    alert('請輸入有效的 PAT！');
+                    return;
+                }
+
+                const facebook = sanitizeInput(facebookInput.value.trim());
+                const phone = sanitizeInput(phoneInput.value.trim());
+                const line = sanitizeInput(lineInput.value.trim());
+
+                if (!facebook || !validateUrl(facebook)) {
+                    alert('請輸入有效的 Facebook 連結！');
+                    return;
+                }
+                if (!phone || !validatePhone(phone)) {
+                    alert('請輸入有效的電話號碼！');
+                    return;
+                }
+                if (!line || !validateUrl(line)) {
+                    alert('請輸入有效的 Line 連結！');
+                    return;
+                }
+
+                const contactData = {
+                    facebook: facebook,
+                    phone: `tel:${phone}`,
+                    line: line
+                };
+                const contactJson = JSON.stringify(contactData, null, 2);
+                const base64Content = btoa(unescape(encodeURIComponent(contactJson)));
+
+                try {
+                    const uploadSuccess = await uploadToGitHub(token, 'content/contact.txt', base64Content, 'contact.txt');
+                    if (uploadSuccess) {
+                        console.log('上傳 contact.txt 成功');
+                        alert('聯絡資訊已成功更新！');
+                    } else {
+                        console.log('上傳 contact.txt 失敗');
+                        alert('聯絡資訊上傳失敗，請檢查 PAT 或網路！');
+                    }
+                } catch (error) {
+                    console.error('上傳 contact.txt 錯誤: ' + error.message);
+                    alert('上傳聯絡資訊時發生錯誤：' + error.message);
+                }
+            });
+
             uploadBtn.addEventListener('click', async () => {
                 console.log('點擊上傳按鈕，開始處理');
 
@@ -295,6 +408,11 @@
                 if (indexUpload.files.length > 0) {
                     const file = indexUpload.files[0];
                     console.log('選擇首頁檔案: ' + file.name + ', 類型: ' + file.type);
+                    if (file.name !== 'index.txt') {
+                        console.log('首頁檔案名稱錯誤');
+                        alert('首頁檔案名稱必須為 index.txt！');
+                        return;
+                    }
                     if (!['text/plain', 'application/octet-stream'].includes(file.type) && !file.name.toLowerCase().endsWith('.txt')) {
                         console.log('首頁檔案格式錯誤');
                         alert('請上傳 .txt 檔案！');
@@ -323,6 +441,11 @@
                 if (newsUpload.files.length > 0) {
                     const file = newsUpload.files[0];
                     console.log('選擇最新消息檔案: ' + file.name + ', 類型: ' + file.type);
+                    if (file.name !== 'news.txt') {
+                        console.log('最新消息檔案名稱錯誤');
+                        alert('最新消息檔案名稱必須為 news.txt！');
+                        return;
+                    }
                     if (!['text/plain', 'application/octet-stream'].includes(file.type) && !file.name.toLowerCase().endsWith('.txt')) {
                         console.log('最新消息檔案格式錯誤');
                         alert('請上傳 .txt 檔案！');
@@ -383,6 +506,11 @@
                 if (serviceUpload.files.length > 0) {
                     const file = serviceUpload.files[0];
                     console.log('選擇服務介紹檔案: ' + file.name + ', 類型: ' + file.type);
+                    if (file.name !== 'service.txt') {
+                        console.log('服務介紹檔案名稱錯誤');
+                        alert('服務介紹檔案名稱必須為 service.txt！');
+                        return;
+                    }
                     if (!['text/plain', 'application/octet-stream'].includes(file.type) && !file.name.toLowerCase().endsWith('.txt')) {
                         console.log('服務介紹檔案格式錯誤');
                         alert('請上傳 .txt 檔案！');
@@ -443,6 +571,11 @@
                 if (aboutUpload.files.length > 0) {
                     const file = aboutUpload.files[0];
                     console.log('選擇關於我們檔案: ' + file.name + ', 類型: ' + file.type);
+                    if (file.name !== 'about.txt') {
+                        console.log('關於我們檔案名稱錯誤');
+                        alert('關於我們檔案名稱必須為 about.txt！');
+                        return;
+                    }
                     if (!['text/plain', 'application/octet-stream'].includes(file.type) && !file.name.toLowerCase().endsWith('.txt')) {
                         console.log('關於我們檔案格式錯誤');
                         alert('請上傳 .txt 檔案！');
@@ -520,25 +653,4 @@
                         const errorData = await response.json();
                         console.error('GitHub API 上傳失敗: ' + errorData.message);
                         if (errorData.message.includes('Not Found')) {
-                            alert('上傳失敗: 倉庫 stockcorp/pawnshop 不存在或檔案路徑無效！');
-                        } else if (errorData.message.includes('Invalid token')) {
-                            alert('上傳失敗: 無效的 PAT，請確認權限！');
-                        } else {
-                            alert('上傳失敗: ' + errorData.message);
-                        }
-                        return false;
-                    }
-                } catch (error) {
-                    console.error('上傳至 GitHub 錯誤: ' + error.message);
-                    throw error;
-                }
-            }
-
-            // 輸入時隱藏錯誤訊息
-            githubTokenInput.addEventListener('input', () => {
-                errorMessage.style.display = 'none';
-            });
-        });
-    </script>
-</body>
-</html>
+                            alert('上傳失敗: 倉庫 stockcorp/pawnshop 不存在或檔案
