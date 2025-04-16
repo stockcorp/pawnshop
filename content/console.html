@@ -139,6 +139,9 @@
             background: #b8860b;
             transform: scale(1.05);
         }
+        .upload-btn:active {
+            transform: scale(0.95);
+        }
         .download-section {
             margin-top: 20px;
             text-align: center;
@@ -283,6 +286,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('後台頁面載入完成，初始化事件');
+
             const githubTokenInput = document.getElementById('github-token');
             const indexUpload = document.getElementById('index-upload');
             const newsUpload = document.getElementById('news-upload');
@@ -299,6 +304,12 @@
             const updateContactBtn = document.getElementById('update-contact-btn');
             const errorMessage = document.getElementById('error-message');
             const uploadBtn = document.getElementById('upload-btn');
+
+            if (!uploadBtn) {
+                console.error('未找到上傳按鈕，檢查 ID "upload-btn"');
+                alert('頁面初始化失敗，請重新載入！');
+                return;
+            }
 
             // 動態更新照片下拉選單
             function updatePhotoSelect(count) {
@@ -340,41 +351,41 @@
             // 更新聯絡資訊
             updateContactBtn.addEventListener('click', async () => {
                 console.log('點擊更新聯絡資訊按鈕');
-                const token = githubTokenInput.value.replace(/\s+/g, '');
-                if (!token) {
-                    console.log('未輸入 PAT');
-                    errorMessage.textContent = '請輸入有效的 PAT！';
-                    errorMessage.style.display = 'block';
-                    alert('請輸入有效的 PAT！');
-                    return;
-                }
-
-                const facebook = sanitizeInput(facebookInput.value.trim());
-                const phone = sanitizeInput(phoneInput.value.trim());
-                const line = sanitizeInput(lineInput.value.trim());
-
-                if (!facebook || !validateUrl(facebook)) {
-                    alert('請輸入有效的 Facebook 連結！');
-                    return;
-                }
-                if (!phone || !validatePhone(phone)) {
-                    alert('請輸入有效的電話號碼！');
-                    return;
-                }
-                if (!line || !validateUrl(line)) {
-                    alert('請輸入有效的 Line 連結！');
-                    return;
-                }
-
-                const contactData = {
-                    facebook: facebook,
-                    phone: `tel:${phone}`,
-                    line: line
-                };
-                const contactJson = JSON.stringify(contactData, null, 2);
-                const base64Content = btoa(unescape(encodeURIComponent(contactJson)));
-
                 try {
+                    const token = githubTokenInput.value.replace(/\s+/g, '');
+                    if (!token) {
+                        console.log('未輸入 PAT');
+                        errorMessage.textContent = '請輸入有效的 PAT！';
+                        errorMessage.style.display = 'block';
+                        alert('請輸入有效的 PAT！');
+                        return;
+                    }
+
+                    const facebook = sanitizeInput(facebookInput.value.trim());
+                    const phone = sanitizeInput(phoneInput.value.trim());
+                    const line = sanitizeInput(lineInput.value.trim());
+
+                    if (!facebook || !validateUrl(facebook)) {
+                        alert('請輸入有效的 Facebook 連結！');
+                        return;
+                    }
+                    if (!phone || !validatePhone(phone)) {
+                        alert('請輸入有效的電話號碼！');
+                        return;
+                    }
+                    if (!line || !validateUrl(line)) {
+                        alert('請輸入有效的 Line 連結！');
+                        return;
+                    }
+
+                    const contactData = {
+                        facebook: facebook,
+                        phone: `tel:${phone}`,
+                        line: line
+                    };
+                    const contactJson = JSON.stringify(contactData, null, 2);
+                    const base64Content = btoa(unescape(encodeURIComponent(contactJson)));
+
                     const uploadSuccess = await uploadToGitHub(token, 'content/contact.txt', base64Content, 'contact.txt');
                     if (uploadSuccess) {
                         console.log('上傳 contact.txt 成功');
@@ -384,225 +395,229 @@
                         alert('聯絡資訊上傳失敗，請檢查 PAT 或網路！');
                     }
                 } catch (error) {
-                    console.error('上傳 contact.txt 錯誤: ' + error.message);
+                    console.error('上傳聯絡資訊錯誤: ' + error.message);
                     alert('上傳聯絡資訊時發生錯誤：' + error.message);
                 }
             });
 
             uploadBtn.addEventListener('click', async () => {
                 console.log('點擊上傳按鈕，開始處理');
-
-                const token = githubTokenInput.value.replace(/\s+/g, '');
-                if (!token) {
-                    console.log('未輸入 PAT');
-                    errorMessage.textContent = '請輸入有效的 PAT！';
-                    errorMessage.style.display = 'block';
-                    alert('請輸入有效的 PAT！');
-                    return;
-                }
-                errorMessage.style.display = 'none';
-
-                let uploaded = false;
-
-                // 上傳首頁
-                if (indexUpload.files.length > 0) {
-                    const file = indexUpload.files[0];
-                    console.log('選擇首頁檔案: ' + file.name + ', 類型: ' + file.type);
-                    if (file.name !== 'index.txt') {
-                        console.log('首頁檔案名稱錯誤');
-                        alert('首頁檔案名稱必須為 index.txt！');
+                try {
+                    const token = githubTokenInput.value.replace(/\s+/g, '');
+                    if (!token) {
+                        console.log('未輸入 PAT');
+                        errorMessage.textContent = '請輸入有效的 PAT！';
+                        errorMessage.style.display = 'block';
+                        alert('請輸入有效的 PAT！');
                         return;
                     }
-                    if (!['text/plain', 'application/octet-stream'].includes(file.type) && !file.name.toLowerCase().endsWith('.txt')) {
-                        console.log('首頁檔案格式錯誤');
-                        alert('請上傳 .txt 檔案！');
-                        return;
-                    }
+                    errorMessage.style.display = 'none';
 
-                    try {
-                        const content = await file.text();
-                        const base64Content = btoa(unescape(encodeURIComponent(content)));
-                        const uploadSuccess = await uploadToGitHub(token, 'content/index.txt', base64Content, file.name);
-                        if (uploadSuccess) {
-                            console.log('上傳 index.txt 成功');
-                            alert('首頁內容已成功上傳！');
-                            uploaded = true;
-                        } else {
-                            console.log('上傳 index.txt 失敗');
-                            alert('首頁內容上傳失敗，請檢查 PAT 或網路！');
+                    let uploaded = false;
+
+                    // 上傳首頁
+                    if (indexUpload.files.length > 0) {
+                        const file = indexUpload.files[0];
+                        console.log('選擇首頁檔案: ' + file.name + ', 類型: ' + file.type);
+                        if (file.name !== 'index.txt') {
+                            console.log('首頁檔案名稱錯誤');
+                            alert('首頁檔案名稱必須為 index.txt！');
+                            return;
                         }
-                    } catch (error) {
-                        console.error('上傳 index.txt 錯誤: ' + error.message);
-                        alert('上傳首頁內容時發生錯誤：' + error.message);
-                    }
-                }
-
-                // 上傳最新消息（文字）
-                if (newsUpload.files.length > 0) {
-                    const file = newsUpload.files[0];
-                    console.log('選擇最新消息檔案: ' + file.name + ', 類型: ' + file.type);
-                    if (file.name !== 'news.txt') {
-                        console.log('最新消息檔案名稱錯誤');
-                        alert('最新消息檔案名稱必須為 news.txt！');
-                        return;
-                    }
-                    if (!['text/plain', 'application/octet-stream'].includes(file.type) && !file.name.toLowerCase().endsWith('.txt')) {
-                        console.log('最新消息檔案格式錯誤');
-                        alert('請上傳 .txt 檔案！');
-                        return;
-                    }
-
-                    try {
-                        const content = await file.text();
-                        const base64Content = btoa(unescape(encodeURIComponent(content)));
-                        const uploadSuccess = await uploadToGitHub(token, 'content/news.txt', base64Content, file.name);
-                        if (uploadSuccess) {
-                            console.log('上傳 news.txt 成功');
-                            alert('最新消息文字已成功上傳！');
-                            uploaded = true;
-                        } else {
-                            console.log('上傳 news.txt 失敗');
-                            alert('最新消息文字上傳失敗，請檢查 PAT 或網路！');
+                        if (!['text/plain', 'application/octet-stream'].includes(file.type)) {
+                            console.log('首頁檔案格式錯誤');
+                            alert('請上傳 .txt 檔案！');
+                            return;
                         }
-                    } catch (error) {
-                        console.error('上傳 news.txt 錯誤: ' + error.message);
-                        alert('上傳最新消息文字時發生錯誤：' + error.message);
-                    }
-                }
 
-                // 上傳最新消息（圖片）
-                if (photoUpload.files.length > 0) {
-                    const file = photoUpload.files[0];
-                    console.log('選擇最新消息照片檔案: ' + file.name + ', 類型: ' + file.type);
-                    if (!['image/jpeg', 'image/jpg'].includes(file.type) && !file.name.toLowerCase().endsWith('.jpg')) {
-                        console.log('最新消息照片檔案格式錯誤');
-                        alert('請上傳 .jpg 檔案！');
-                        return;
-                    }
-
-                    try {
-                        const reader = new FileReader();
-                        const base64Content = await new Promise(resolve => {
-                            reader.onload = () => resolve(reader.result.split(',')[1]);
-                            reader.readAsDataURL(file);
-                        });
-                        const selectedPic = 'img/pic' + photoSelect.value + '.jpg';
-                        const uploadSuccess = await uploadToGitHub(token, selectedPic, base64Content, file.name);
-                        if (uploadSuccess) {
-                            console.log('上傳 ' + selectedPic + ' 成功');
-                            alert('最新消息圖片 ' + selectedPic + ' 已成功上傳！');
-                            uploaded = true;
-                        } else {
-                            console.log('上傳 ' + selectedPic + ' 失敗');
-                            alert('最新消息圖片 ' + selectedPic + ' 上傳失敗，請檢查 PAT 或網路！');
+                        try {
+                            const content = await file.text();
+                            const base64Content = btoa(unescape(encodeURIComponent(content)));
+                            const uploadSuccess = await uploadToGitHub(token, 'content/index.txt', base64Content, file.name);
+                            if (uploadSuccess) {
+                                console.log('上傳 index.txt 成功');
+                                alert('首頁內容已成功上傳！');
+                                uploaded = true;
+                            } else {
+                                console.log('上傳 index.txt 失敗');
+                                alert('首頁內容上傳失敗，請檢查 PAT 或網路！');
+                            }
+                        } catch (error) {
+                            console.error('上傳 index.txt 錯誤: ' + error.message);
+                            alert('上傳首頁內容時發生錯誤：' + error.message);
                         }
-                    } catch (error) {
-                        console.error('上傳 ' + selectedPic + ' 錯誤: ' + error.message);
-                        alert('上傳最新消息圖片時發生錯誤：' + error.message);
-                    }
-                }
-
-                // 上傳服務介紹（文字）
-                if (serviceUpload.files.length > 0) {
-                    const file = serviceUpload.files[0];
-                    console.log('選擇服務介紹檔案: ' + file.name + ', 類型: ' + file.type);
-                    if (file.name !== 'service.txt') {
-                        console.log('服務介紹檔案名稱錯誤');
-                        alert('服務介紹檔案名稱必須為 service.txt！');
-                        return;
-                    }
-                    if (!['text/plain', 'application/octet-stream'].includes(file.type) && !file.name.toLowerCase().endsWith('.txt')) {
-                        console.log('服務介紹檔案格式錯誤');
-                        alert('請上傳 .txt 檔案！');
-                        return;
                     }
 
-                    try {
-                        const content = await file.text();
-                        const base64Content = btoa(unescape(encodeURIComponent(content)));
-                        const uploadSuccess = await uploadToGitHub(token, 'content/service.txt', base64Content, file.name);
-                        if (uploadSuccess) {
-                            console.log('上傳 service.txt 成功');
-                            alert('服務介紹文字已成功上傳！');
-                            uploaded = true;
-                        } else {
-                            console.log('上傳 service.txt 失敗');
-                            alert('服務介紹文字上傳失敗，請檢查 PAT 或網路！');
+                    // 上傳最新消息（文字）
+                    if (newsUpload.files.length > 0) {
+                        const file = newsUpload.files[0];
+                        console.log('選擇最新消息檔案: ' + file.name + ', 類型: ' + file.type);
+                        if (file.name !== 'news.txt') {
+                            console.log('最新消息檔案名稱錯誤');
+                            alert('最新消息檔案名稱必須為 news.txt！');
+                            return;
                         }
-                    } catch (error) {
-                        console.error('上傳 service.txt 錯誤: ' + error.message);
-                        alert('上傳服務介紹文字時發生錯誤：' + error.message);
-                    }
-                }
-
-                // 上傳服務介紹（圖片）
-                if (servicePhotoUpload.files.length > 0) {
-                    const file = servicePhotoUpload.files[0];
-                    console.log('選擇服務照片檔案: ' + file.name + ', 類型: ' + file.type);
-                    if (!['image/jpeg', 'image/jpg'].includes(file.type) && !file.name.toLowerCase().endsWith('.jpg')) {
-                        console.log('服務照片檔案格式錯誤');
-                        alert('請上傳 .jpg 檔案！');
-                        return;
-                    }
-
-                    try {
-                        const reader = new FileReader();
-                        const base64Content = await new Promise(resolve => {
-                            reader.onload = () => resolve(reader.result.split(',')[1]);
-                            reader.readAsDataURL(file);
-                        });
-                        const selectedPic = 'img/service' + servicePhotoSelect.value + '.jpg';
-                        const uploadSuccess = await uploadToGitHub(token, selectedPic, base64Content, file.name);
-                        if (uploadSuccess) {
-                            console.log('上傳 ' + selectedPic + ' 成功');
-                            alert('服務圖片 ' + selectedPic + ' 已成功上傳！');
-                            uploaded = true;
-                        } else {
-                            console.log('上傳 ' + selectedPic + ' 失敗');
-                            alert('服務圖片 ' + selectedPic + ' 上傳失敗，請檢查 PAT 或網路！');
+                        if (!['text/plain', 'application/octet-stream'].includes(file.type)) {
+                            console.log('最新消息檔案格式錯誤');
+                            alert('請上傳 .txt 檔案！');
+                            return;
                         }
-                    } catch (error) {
-                        console.error('上傳 ' + selectedPic + ' 錯誤: ' + error.message);
-                        alert('上傳服務圖片時發生錯誤：' + error.message);
-                    }
-                }
 
-                // 上傳關於我們
-                if (aboutUpload.files.length > 0) {
-                    const file = aboutUpload.files[0];
-                    console.log('選擇關於我們檔案: ' + file.name + ', 類型: ' + file.type);
-                    if (file.name !== 'about.txt') {
-                        console.log('關於我們檔案名稱錯誤');
-                        alert('關於我們檔案名稱必須為 about.txt！');
-                        return;
-                    }
-                    if (!['text/plain', 'application/octet-stream'].includes(file.type) && !file.name.toLowerCase().endsWith('.txt')) {
-                        console.log('關於我們檔案格式錯誤');
-                        alert('請上傳 .txt 檔案！');
-                        return;
-                    }
-
-                    try {
-                        const content = await file.text();
-                        const base64Content = btoa(unescape(encodeURIComponent(content)));
-                        const uploadSuccess = await uploadToGitHub(token, 'content/about.txt', base64Content, file.name);
-                        if (uploadSuccess) {
-                            console.log('上傳 about.txt 成功');
-                            alert('關於我們內容已成功上傳！');
-                            uploaded = true;
-                        } else {
-                            console.log('上傳 about.txt 失敗');
-                            alert('關於我們內容上傳失敗，請檢查 PAT 或網路！');
+                        try {
+                            const content = await file.text();
+                            const base64Content = btoa(unescape(encodeURIComponent(content)));
+                            const uploadSuccess = await uploadToGitHub(token, 'content/news.txt', base64Content, file.name);
+                            if (uploadSuccess) {
+                                console.log('上傳 news.txt 成功');
+                                alert('最新消息文字已成功上傳！');
+                                uploaded = true;
+                            } else {
+                                console.log('上傳 news.txt 失敗');
+                                alert('最新消息文字上傳失敗，請檢查 PAT 或網路！');
+                            }
+                        } catch (error) {
+                            console.error('上傳 news.txt 錯誤: ' + error.message);
+                            alert('上傳最新消息文字時發生錯誤：' + error.message);
                         }
-                    } catch (error) {
-                        console.error('上傳 about.txt 錯誤: ' + error.message);
-                        alert('上傳關於我們內容時發生錯誤：' + error.message);
                     }
-                }
 
-                if (!uploaded) {
-                    console.log('無檔案選擇，提示用戶');
-                    alert('請選擇要上傳的檔案！');
+                    // 上傳最新消息（圖片）
+                    if (photoUpload.files.length > 0) {
+                        const file = photoUpload.files[0];
+                        console.log('選擇最新消息照片檔案: ' + file.name + ', 類型: ' + file.type);
+                        if (!['image/jpeg', 'image/jpg'].includes(file.type)) {
+                            console.log('最新消息照片檔案格式錯誤');
+                            alert('請上傳 .jpg 檔案！');
+                            return;
+                        }
+
+                        try {
+                            const reader = new FileReader();
+                            const base64Content = await new Promise(resolve => {
+                                reader.onload = () => resolve(reader.result.split(',')[1]);
+                                reader.readAsDataURL(file);
+                            });
+                            const selectedPic = 'img/pic' + photoSelect.value + '.jpg';
+                            const uploadSuccess = await uploadToGitHub(token, selectedPic, base64Content, file.name);
+                            if (uploadSuccess) {
+                                console.log('上傳 ' + selectedPic + ' 成功');
+                                alert('最新消息圖片 ' + selectedPic + ' 已成功上傳！');
+                                uploaded = true;
+                            } else {
+                                console.log('上傳 ' + selectedPic + ' 失敗');
+                                alert('最新消息圖片 ' + selectedPic + ' 上傳失敗，請檢查 PAT 或網路！');
+                            }
+                        } catch (error) {
+                            console.error('上傳 ' + selectedPic + ' 錯誤: ' + error.message);
+                            alert('上傳最新消息圖片時發生錯誤：' + error.message);
+                        }
+                    }
+
+                    // 上傳服務介紹（文字）
+                    if (serviceUpload.files.length > 0) {
+                        const file = serviceUpload.files[0];
+                        console.log('選擇服務介紹檔案: ' + file.name + ', 類型: ' + file.type);
+                        if (file.name !== 'service.txt') {
+                            console.log('服務介紹檔案名稱錯誤');
+                            alert('服務介紹檔案名稱必須為 service.txt！');
+                            return;
+                        }
+                        if (!['text/plain', 'application/octet-stream'].includes(file.type)) {
+                            console.log('服務介紹檔案格式錯誤');
+                            alert('請上傳 .txt 檔案！');
+                            return;
+                        }
+
+                        try {
+                            const content = await file.text();
+                            const base64Content = btoa(unescape(encodeURIComponent(content)));
+                            const uploadSuccess = await uploadToGitHub(token, 'content/service.txt', base64Content, file.name);
+                            if (uploadSuccess) {
+                                console.log('上傳 service.txt 成功');
+                                alert('服務介紹文字已成功上傳！');
+                                uploaded = true;
+                            } else {
+                                console.log('上傳 service.txt 失敗');
+                                alert('服務介紹文字上傳失敗，請檢查 PAT 或網路！');
+                            }
+                        } catch (error) {
+                            console.error('上傳 service.txt 錯誤: ' + error.message);
+                            alert('上傳服務介紹文字時發生錯誤：' + error.message);
+                        }
+                    }
+
+                    // 上傳服務介紹（圖片）
+                    if (servicePhotoUpload.files.length > 0) {
+                        const file = servicePhotoUpload.files[0];
+                        console.log('選擇服務照片檔案: ' + file.name + ', 類型: ' + file.type);
+                        if (!['image/jpeg', 'image/jpg'].includes(file.type)) {
+                            console.log('服務照片檔案格式錯誤');
+                            alert('請上傳 .jpg 檔案！');
+                            return;
+                        }
+
+                        try {
+                            const reader = new FileReader();
+                            const base64Content = await new Promise(resolve => {
+                                reader.onload = () => resolve(reader.result.split(',')[1]);
+                                reader.readAsDataURL(file);
+                            });
+                            const selectedPic = 'img/service' + servicePhotoSelect.value + '.jpg';
+                            const uploadSuccess = await uploadToGitHub(token, selectedPic, base64Content, file.name);
+                            if (uploadSuccess) {
+                                console.log('上傳 ' + selectedPic + ' 成功');
+                                alert('服務圖片 ' + selectedPic + ' 已成功上傳！');
+                                uploaded = true;
+                            } else {
+                                console.log('上傳 ' + selectedPic + ' 失敗');
+                                alert('服務圖片 ' + selectedPic + ' 上傳失敗，請檢查 PAT 或網路！');
+                            }
+                        } catch (error) {
+                            console.error('上傳 ' + selectedPic + ' 錯誤: ' + error.message);
+                            alert('上傳服務圖片時發生錯誤：' + error.message);
+                        }
+                    }
+
+                    // 上傳關於我們
+                    if (aboutUpload.files.length > 0) {
+                        const file = aboutUpload.files[0];
+                        console.log('選擇關於我們檔案: ' + file.name + ', 類型: ' + file.type);
+                        if (file.name !== 'about.txt') {
+                            console.log('關於我們檔案名稱錯誤');
+                            alert('關於我們檔案名稱必須為 about.txt！');
+                            return;
+                        }
+                        if (!['text/plain', 'application/octet-stream'].includes(file.type)) {
+                            console.log('關於我們檔案格式錯誤');
+                            alert('請上傳 .txt 檔案！');
+                            return;
+                        }
+
+                        try {
+                            const content = await file.text();
+                            const base64Content = btoa(unescape(encodeURIComponent(content)));
+                            const uploadSuccess = await uploadToGitHub(token, 'content/about.txt', base64Content, file.name);
+                            if (uploadSuccess) {
+                                console.log('上傳 about.txt 成功');
+                                alert('關於我們內容已成功上傳！');
+                                uploaded = true;
+                            } else {
+                                console.log('上傳 about.txt 失敗');
+                                alert('關於我們內容上傳失敗，請檢查 PAT 或網路！');
+                            }
+                        } catch (error) {
+                            console.error('上傳 about.txt 錯誤: ' + error.message);
+                            alert('上傳關於我們內容時發生錯誤：' + error.message);
+                        }
+                    }
+
+                    if (!uploaded) {
+                        console.log('無檔案選擇，提示用戶');
+                        alert('請選擇要上傳的檔案！');
+                    }
+                } catch (error) {
+                    console.error('上傳過程發生錯誤: ' + error.message);
+                    alert('上傳失敗，請檢查網路或 PAT！');
                 }
             });
 
@@ -626,7 +641,8 @@
                         } else if (getResponse.status === 404) {
                             console.log('檔案不存在，將創建新檔案');
                         } else {
-                            throw new Error('獲取檔案資訊失敗，狀態碼: ' + getResponse.status);
+                            console.error('獲取檔案資訊失敗，狀態碼: ' + getResponse.status);
+                            return false;
                         }
                     } catch (error) {
                         console.warn('獲取 SHA 失敗，可能為新檔案: ' + error.message);
@@ -653,4 +669,25 @@
                         const errorData = await response.json();
                         console.error('GitHub API 上傳失敗: ' + errorData.message);
                         if (errorData.message.includes('Not Found')) {
-                            alert('上傳失敗: 倉庫 stockcorp/pawnshop 不存在或檔案
+                            alert('上傳失敗: 倉庫 stockcorp/pawnshop 不存在或檔案路徑無效！');
+                        } else if (errorData.message.includes('Invalid token')) {
+                            alert('上傳失敗: 無效的 PAT，請確認權限！');
+                        } else {
+                            alert('上傳失敗: ' + errorData.message);
+                        }
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('上傳至 GitHub 錯誤: ' + error.message);
+                    return false;
+                }
+            }
+
+            // 輸入時隱藏錯誤訊息
+            githubTokenInput.addEventListener('input', () => {
+                errorMessage.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
