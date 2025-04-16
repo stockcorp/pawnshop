@@ -1,5 +1,5 @@
 {
   "facebook": "https://www.facebook.com/yourpawnshop",
-  "phone": "tel:+886123456789",
+  "phone": "tel:0911222333",
   "line": "https://line.me/ti/p/your-line-id"
 }
