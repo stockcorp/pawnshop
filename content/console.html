@@ -387,6 +387,35 @@
                     websiteInput.value = 'https://stockcorp.github.io/pawnshop';
                 });
 
+            // 載入聯絡資訊（預設值）
+            fetch('content/contact.txt')
+                .then(response => response.ok ? response.text() : Promise.reject('檔案未找到'))
+                .then(data => {
+                    try {
+                        const contactData = JSON.parse(data);
+                        facebookInput.value = contactData.facebook || '';
+                        phoneInput.value = contactData.phone ? contactData.phone.replace('tel:', '') : '';
+                        lineInput.value = contactData.line || '';
+                        xInput.value = contactData.x || '';
+                        instagramInput.value = contactData.instagram || '';
+                    } catch (e) {
+                        console.error('解析聯絡資訊失敗:', e);
+                        facebookInput.value = 'https://www.facebook.com/example';
+                        phoneInput.value = '0912-345-678';
+                        lineInput.value = 'https://line.me/ti/p/example';
+                        xInput.value = 'https://x.com/example';
+                        instagramInput.value = 'https://www.instagram.com/example';
+                    }
+                })
+                .catch(error => {
+                    console.error('載入聯絡資訊失敗:', error);
+                    facebookInput.value = 'https://www.facebook.com/example';
+                    phoneInput.value = '0912-345-678';
+                    lineInput.value = 'https://line.me/ti/p/example';
+                    xInput.value = 'https://x.com/example';
+                    instagramInput.value = 'https://www.instagram.com/example';
+                });
+
             // 動態更新照片下拉選單
             function updatePhotoSelect(count) {
                 photoSelect.innerHTML = '';
@@ -508,23 +537,6 @@
                     if (!token) {
                         alert('請輸入有效的 PAT！');
                         return;
-                    }
-
-                    // 載入現有聯絡資訊
-                    let currentContact = {
-                        facebook: "",
-                        phone: "",
-                        line: "",
-                        x: "",
-                        instagram: ""
-                    };
-                    try {
-                        const response = await fetch('content/contact.txt');
-                        if (response.ok) {
-                            currentContact = JSON.parse(await response.text());
-                        }
-                    } catch (e) {
-                        console.warn('載入現有聯絡資訊失敗，使用預設值');
                     }
 
                     const facebook = sanitizeInput(facebookInput.value.trim());
