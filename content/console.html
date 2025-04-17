@@ -370,7 +370,7 @@
             console.log('綁定更新網站名稱按鈕');
             console.log('綁定更新網站地址按鈕');
 
-            // 載入網站名稱（預設從 content/name.txt）
+            // 載入網站名稱（從 content/name.txt）
             fetch('content/name.txt')
                 .then(response => {
                     if (!response.ok) throw new Error(`無法載入 name.txt，狀態碼: ${response.status}`);
