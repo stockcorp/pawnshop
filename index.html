@@ -99,6 +99,11 @@
             flex-direction: column;
             gap: 10px;
             z-index: 1000;
+            transition: max-height 0.3s ease;
+        }
+        .contact-float.collapsed {
+            max-height: 60px;
+            overflow: hidden;
         }
         .contact-float a {
             display: flex;
@@ -112,6 +117,20 @@
         }
         .contact-float a:hover {
             opacity: 0.9;
+        }
+        .toggle-contact-btn {
+            background: #d4a017;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        .toggle-contact-btn:hover {
+            background: #8b5a2b;
+            transform: scale(1.05);
         }
         .article-card {
             cursor: pointer;
@@ -168,7 +187,7 @@
                 right: 10px;
                 padding: 8px;
             }
-            .contact-float a {
+            .contact-float a, .toggle-contact-btn {
                 padding: 6px;
                 font-size: 0.9rem;
             }
@@ -291,7 +310,8 @@
         </footer>
 
         <!-- 右下角浮動聯絡我們 -->
-        <div class="contact-float">
+        <div class="contact-float collapsed">
+            <button id="toggle-contact-btn">展開聯繫方式</button>
             <a id="facebook-float" href="#" target="_blank" class="bg-blue-600 hidden">XX當鋪 (Facebook)</a>
             <a id="phone-float" href="#" class="bg-red-600 hidden">XX當鋪 (電話)</a>
             <a id="line-float" href="#" target="_blank" class="bg-green-600 hidden">XX當鋪 (Line)</a>
@@ -450,6 +470,15 @@
                     console.error('載入聯絡資訊失敗:', error);
                     updateContactLinks();
                 });
+
+            // 浮動按鈕收合功能
+            const contactFloat = document.querySelector('.contact-float');
+            const toggleContactBtn = document.getElementById('toggle-contact-btn');
+            toggleContactBtn.addEventListener('click', () => {
+                console.log('切換浮動按鈕狀態');
+                contactFloat.classList.toggle('collapsed');
+                toggleContactBtn.textContent = contactFloat.classList.contains('collapsed') ? '展開聯繫方式' : '收起聯繫方式';
+            });
 
             function updateContactLinks() {
                 const contacts = [
