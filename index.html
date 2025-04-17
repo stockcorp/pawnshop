@@ -411,7 +411,7 @@
                 document.getElementById('home-title').textContent = `借款須知`;
                 document.getElementById('about-title').textContent = `關於我們`;
                 document.getElementById('contact-title').textContent = `聯絡我們`;
-                document.getElementById('footer-text').textContent = `@2025年 ${name} 保留最後權利`;
+                document.getElementById('footer-text').textContent = `@2025年 ${name} 保留最終權利`;
                 updateContactLinks();
             }
 
@@ -425,7 +425,7 @@
                 })
                 .catch(error => {
                     console.error('載入網站名稱失敗:', error);
-                    updateSiteName('XX當鋪');
+                    updateSiteName('');
                 });
 
             // 載入網站地址
