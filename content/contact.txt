@@ -2,6 +2,6 @@
   "facebook": "https://www.facebook.com/example",
   "phone": "tel:0912345678",
   "line": "https://line.me/ti/p/example",
-  "x": "",
+  "x": "https://x.com/example",
   "instagram": "https://www.instagram.com/example"
 }
