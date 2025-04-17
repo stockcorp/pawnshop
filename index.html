@@ -440,6 +440,7 @@
                 .then(data => {
                     try {
                         contactInfo = JSON.parse(data);
+                        console.log('載入 contact.txt 成功:', contactInfo);
                     } catch (e) {
                         console.error('解析聯絡資訊失敗:', e);
                     }
@@ -462,13 +463,15 @@
                 contacts.forEach(contact => {
                     const contactElement = document.getElementById(contact.contactId);
                     const floatElement = document.getElementById(contact.floatId);
-                    const hasValue = contactInfo[contact.id];
+                    const hasValue = contactInfo[contact.id] && contactInfo[contact.id].trim() !== '';
 
-                    contactElement.href = hasValue || '#';
-                    floatElement.href = hasValue || '#';
+                    // 更新 href 和顯示狀態
+                    contactElement.href = hasValue ? contactInfo[contact.id] : '#';
+                    floatElement.href = hasValue ? contactInfo[contact.id] : '#';
                     contactElement.classList.toggle('hidden', !hasValue);
                     floatElement.classList.toggle('hidden', !hasValue);
 
+                    // 更新文字（僅在有值時）
                     if (hasValue) {
                         contactElement.textContent = `${siteName} (${contact.label})`;
                         floatElement.textContent = `${siteName} (${contact.label})`;
